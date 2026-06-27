@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #060713;
+  --color-surface: #0d0f1f;
+  --color-surface-2: #141731;
+  --color-line: rgba(255, 255, 255, 0.08);
+  --color-brand: #6366f1;
+  --color-brand-2: #a855f7;
+  --color-accent: #22d3ee;
+  --color-muted: #9aa0b4;
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: #e9eaf2;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Decorative gradient utilities reused across sections */
+.text-gradient {
+  background-image: linear-gradient(
+    100deg,
+    var(--color-brand) 0%,
+    var(--color-brand-2) 50%,
+    var(--color-accent) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--color-line);
+  backdrop-filter: blur(12px);
+}
+
+.glow {
+  box-shadow: 0 0 0 1px var(--color-line),
+    0 20px 60px -20px rgba(99, 102, 241, 0.45);
+}
+
+::selection {
+  background: rgba(99, 102, 241, 0.35);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-surface-2);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-brand);
+}
