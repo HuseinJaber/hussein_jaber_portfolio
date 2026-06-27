@@ -12,20 +12,33 @@ use Livewire\Component;
 class ProjectManager extends Component
 {
     public bool $showForm = false;
+
     public ?int $editingId = null;
 
     public string $title = '';
+
     public string $category = 'Web';
+
     public string $short_description = '';
+
     public string $description = '';
+
     public string $cover_image = '';
+
     public string $tech_stack = '';
+
     public string $live_url = '';
+
     public string $source_url = '';
+
     public string $client = '';
+
     public ?int $year = null;
+
     public bool $is_featured = false;
+
     public bool $is_published = true;
+
     public int $sort_order = 0;
 
     protected function rules(): array

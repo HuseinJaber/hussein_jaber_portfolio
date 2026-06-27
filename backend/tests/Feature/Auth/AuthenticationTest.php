@@ -54,17 +54,17 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
     }
 
-    public function test_navigation_menu_can_be_rendered(): void
+    public function test_dashboard_redirects_to_admin_panel(): void
     {
         $user = User::factory()->create();
 
         $this->actingAs($user);
 
-        $response = $this->get('/dashboard');
+        // The default Breeze dashboard is repurposed as a redirect into the
+        // custom Livewire admin panel.
+        $this->get('/dashboard')->assertRedirect('/admin');
 
-        $response
-            ->assertOk()
-            ->assertSeeVolt('layout.navigation');
+        $this->get('/admin')->assertOk();
     }
 
     public function test_users_can_logout(): void

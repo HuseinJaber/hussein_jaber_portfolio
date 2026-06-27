@@ -12,15 +12,23 @@ use Livewire\Component;
 class ExperienceManager extends Component
 {
     public bool $showForm = false;
+
     public ?int $editingId = null;
 
     public string $role = '';
+
     public string $company = '';
+
     public string $location = '';
+
     public string $start_date = '';
+
     public string $end_date = '';
+
     public bool $is_current = false;
+
     public string $description = '';
+
     public int $sort_order = 0;
 
     protected function rules(): array

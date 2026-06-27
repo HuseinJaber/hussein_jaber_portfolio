@@ -12,13 +12,19 @@ use Livewire\Component;
 class SkillManager extends Component
 {
     public bool $showForm = false;
+
     public ?int $editingId = null;
 
     public string $name = '';
+
     public string $category = 'Backend';
+
     public int $level = 80;
+
     public string $icon = '';
+
     public int $sort_order = 0;
+
     public bool $is_active = true;
 
     protected function rules(): array

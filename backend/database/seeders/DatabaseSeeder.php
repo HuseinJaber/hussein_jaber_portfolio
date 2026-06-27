@@ -14,6 +14,7 @@ use App\Models\Testimonial;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
@@ -92,7 +93,7 @@ class DatabaseSeeder extends Seeder
         ];
         foreach ($services as $i => $s) {
             Service::updateOrCreate(
-                ['slug' => \Illuminate\Support\Str::slug($s['title'])],
+                ['slug' => Str::slug($s['title'])],
                 array_merge($s, ['sort_order' => $i + 1, 'is_active' => true])
             );
         }
@@ -148,7 +149,7 @@ class DatabaseSeeder extends Seeder
         ];
         foreach ($projects as $i => $p) {
             Project::updateOrCreate(
-                ['slug' => \Illuminate\Support\Str::slug($p['title'])],
+                ['slug' => Str::slug($p['title'])],
                 array_merge($p, ['sort_order' => $i + 1, 'is_published' => true])
             );
         }

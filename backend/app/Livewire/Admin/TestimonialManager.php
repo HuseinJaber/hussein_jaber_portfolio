@@ -12,15 +12,23 @@ use Livewire\Component;
 class TestimonialManager extends Component
 {
     public bool $showForm = false;
+
     public ?int $editingId = null;
 
     public string $name = '';
+
     public string $role = '';
+
     public string $company = '';
+
     public string $avatar = '';
+
     public string $content = '';
+
     public int $rating = 5;
+
     public bool $is_published = true;
+
     public int $sort_order = 0;
 
     protected function rules(): array

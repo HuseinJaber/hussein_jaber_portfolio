@@ -12,12 +12,17 @@ use Livewire\Component;
 class ServiceManager extends Component
 {
     public bool $showForm = false;
+
     public ?int $editingId = null;
 
     public string $title = '';
+
     public string $description = '';
+
     public string $icon = '';
+
     public int $sort_order = 0;
+
     public bool $is_active = true;
 
     protected function rules(): array

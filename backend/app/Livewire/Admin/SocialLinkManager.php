@@ -12,13 +12,19 @@ use Livewire\Component;
 class SocialLinkManager extends Component
 {
     public bool $showForm = false;
+
     public ?int $editingId = null;
 
     public string $platform = '';
+
     public string $label = '';
+
     public string $url = '';
+
     public string $icon = '';
+
     public int $sort_order = 0;
+
     public bool $is_active = true;
 
     protected function rules(): array

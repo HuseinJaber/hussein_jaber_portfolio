@@ -12,14 +12,21 @@ use Livewire\Component;
 class EducationManager extends Component
 {
     public bool $showForm = false;
+
     public ?int $editingId = null;
 
     public string $degree = '';
+
     public string $institution = '';
+
     public string $location = '';
+
     public string $start_date = '';
+
     public string $end_date = '';
+
     public string $description = '';
+
     public int $sort_order = 0;
 
     protected function rules(): array
