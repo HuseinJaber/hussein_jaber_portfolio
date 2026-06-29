@@ -49,10 +49,12 @@ if [[ ! -L public/storage ]]; then
 fi
 
 chmod -R 775 storage bootstrap/cache 2>/dev/null || true
+rm -f public/hot
 
+php artisan route:clear
+php artisan view:clear
+php artisan config:clear
 php artisan config:cache
-php artisan route:cache
-php artisan view:cache
 
 echo ""
 echo "Done. Document roots in hPanel should be:"
