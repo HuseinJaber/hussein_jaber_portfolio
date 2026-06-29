@@ -5,8 +5,18 @@ the same Hostinger plan — no VPS or Vercel required.
 
 | URL | App | Document root |
 | --- | --- | --- |
-| `https://huseinjaber.com` | React SPA (Vite build) | `public_html/` |
-| `https://api.huseinjaber.com` | Laravel API + admin | `backend/public/` |
+| `https://huseinjaber.com` | React SPA (Vite build) | `public_html/frontend/` |
+| `https://api.huseinjaber.com` | Laravel API + admin | `public_html/backend/public/` |
+
+### Server folder layout
+
+```
+~/domains/huseinjaber.com/public_html/
+├── frontend/          ← Vite dist (index.html, assets/, .htaccess)
+└── backend/           ← Laravel app (.env, vendor/, public/, storage/, …)
+
+~/hussein_jaber_portfolio/   ← git clone (source); sync with scripts/hostinger-sync.sh
+```
 
 ---
 
@@ -148,12 +158,31 @@ php artisan key:generate
 
 ```bash
 composer install --no-dev --optimize-autoloader
-npm ci && npm run build
 ```
 
-If `composer` or `npm` are not available over SSH, use Hostinger’s **PHP**
-version selector (8.3+) and run builds locally, then upload `vendor/` and
-`public/build/` — prefer SSH when possible.
+**Shared hosting often has no `npm`** and disables PHP `exec()`, so `npm run build`
+and `php artisan storage:link` may fail on the server. Use this workaround:
+
+**On your Mac:**
+
+```bash
+cd backend && npm run build
+# Option A — SCP (enter SSH password when prompted):
+scp -P 65002 -r public/build u841931881@YOUR_SERVER_IP:~/hussein_jaber_portfolio/backend/public/
+# Option B — zip + File Manager:
+./scripts/package-backend-build.sh
+# upload backend-build-upload.zip via File Manager, then on SSH:
+# cd ~/hussein_jaber_portfolio/backend/public && unzip -o ~/backend-build-upload.zip
+```
+
+**On Hostinger SSH** (storage symlink — `artisan storage:link` fails when `exec` is disabled):
+
+```bash
+cd ~/hussein_jaber_portfolio/backend
+ln -sfn ../storage/app/public public/storage
+```
+
+Set **PHP 8.3+** in hPanel → **Advanced → PHP Configuration**.
 
 ### Step 9 — Import database
 
@@ -189,29 +218,41 @@ empty database:
 php artisan migrate --force   # only if you did NOT import a dump
 ```
 
-### Step 11 — Point subdomain document root to `public/`
+### Step 11 — Sync into `public_html/{frontend,backend}`
 
-In hPanel → **Websites** → **api.huseinjaber.com** → **Advanced** or
-**Document root**:
+After Laravel is configured in the git clone, run the **one-time layout migration**:
 
-Set document root to:
+```bash
+cd ~/hussein_jaber_portfolio
+chmod +x scripts/hostinger-migrate-layout.sh scripts/hostinger-sync.sh
+./scripts/hostinger-migrate-layout.sh
+```
+
+This creates:
 
 ```
-~/hussein_jaber_portfolio/backend/public
+~/domains/huseinjaber.com/public_html/
+├── frontend/    ← Vite dist
+└── backend/     ← Laravel (includes .env from clone)
 ```
 
-(Use the full path Hostinger shows in File Manager.)
+### Step 12 — Point document roots (hPanel)
 
-### Step 12 — Writable directories
+| Site | Document root |
+|------|----------------|
+| `huseinjaber.com` | `/home/u841931881/domains/huseinjaber.com/public_html/frontend` |
+| `api.huseinjaber.com` | `/home/u841931881/domains/huseinjaber.com/public_html/backend/public` |
 
-Ensure these are writable (755 or 775):
+Replace `u841931881` with your Hostinger username if different.
 
-- `backend/storage/` (recursive)
-- `backend/bootstrap/cache/`
+### Step 13 — Writable directories
 
-In File Manager: right-click → **Permissions** → `storage` and `bootstrap/cache`.
+Ensure these are writable (775):
 
-### Step 13 — Verify backend
+- `public_html/backend/storage/` (recursive)
+- `public_html/backend/bootstrap/cache/`
+
+### Step 14 — Verify backend
 
 - `https://api.huseinjaber.com/api/portfolio` → JSON payload
 - `https://api.huseinjaber.com/admin` → login page
@@ -221,44 +262,40 @@ In File Manager: right-click → **Permissions** → `storage` and `bootstrap/ca
 
 ## Phase 4 — Deploy frontend (huseinjaber.com)
 
-### Step 14 — Production build (on your Mac)
-
-Env vars are **baked in at build time** for Vite:
+### Step 15 — Production build (on your Mac)
 
 ```bash
 cd frontend
 VITE_API_URL=https://api.huseinjaber.com/api \
 VITE_SITE_URL=https://huseinjaber.com \
 npm run build
+git add -f dist/ && git commit -m "Update production frontend build" && git push
 ```
 
-### Step 15 — Upload `dist/` to `public_html`
-
-Upload **everything inside** `frontend/dist/` to the main site’s `public_html`:
-
-- `index.html`
-- `assets/` folder
-- `.htaccess` (SPA routing — required)
-- `favicon.ico`
-
-**Clear** any default Hostinger `index.php` or placeholder files first.
-
-You can upload via File Manager, FTP, or:
+### Step 16 — Sync on server
 
 ```bash
-# Example — adjust remote path to your Hostinger account
-rsync -avz --delete frontend/dist/ user@host:/home/user/domains/huseinjaber.com/public_html/
+cd ~/hussein_jaber_portfolio && git pull
+./scripts/hostinger-sync.sh
 ```
 
-### Step 16 — Verify frontend
+Or manually:
+
+```bash
+rsync -a --delete ~/hussein_jaber_portfolio/frontend/dist/ \
+  ~/domains/huseinjaber.com/public_html/frontend/
+```
+
+Use `rsync` or `cp -r dist/.` — **not** `cp dist/*` (skips `.htaccess`).
+
+### Step 17 — Verify frontend
 
 - `https://huseinjaber.com` — homepage loads with your content
 - `https://huseinjaber.com/projects/<slug>` — project detail (no 404)
 - `https://huseinjaber.com/cv` — résumé page
 - Contact form submits (check admin → Messages)
 
-If routes 404, confirm `.htaccess` is present in `public_html` and **mod_rewrite**
-is enabled (default on Hostinger).
+If routes 404, confirm `.htaccess` is in `public_html/frontend/`.
 
 ---
 
@@ -284,17 +321,24 @@ Then: `php artisan config:cache`
 
 ### Routine updates
 
-```bash
-cd ~/hussein_jaber_portfolio
-git pull origin main
+**Mac** — build, commit, push:
 
-cd backend
+```bash
+# Frontend
+cd frontend && VITE_API_URL=https://api.huseinjaber.com/api VITE_SITE_URL=https://huseinjaber.com npm run build
+git add -f dist/ && git commit -m "Update frontend build" && git push
+
+# Backend admin assets (if admin UI changed)
+cd backend && npm run build && git add -f public/build/ && git commit -m "Update admin build" && git push
+```
+
+**Hostinger SSH:**
+
+```bash
+~/hussein_jaber_portfolio/scripts/hostinger-sync.sh
+cd ~/domains/huseinjaber.com/public_html/backend
 composer install --no-dev --optimize-autoloader
 php artisan migrate --force
-npm ci && npm run build
-php artisan config:cache route:cache view:cache
-
-# Frontend: rebuild on Mac with production VITE_* vars, re-upload dist/
 ```
 
 ### Security checklist
@@ -314,7 +358,7 @@ php artisan config:cache route:cache view:cache
 | API returns 500 | Check `backend/storage/logs/laravel.log`; fix permissions on `storage/` |
 | CORS error in browser | `FRONTEND_URL` must exactly match `https://huseinjaber.com` (no trailing slash) |
 | Admin unstyled | Run `npm run build` in `backend/`; ensure `public/build/` exists |
-| SPA routes 404 | `.htaccess` missing in `public_html` |
+| SPA routes 404 | `.htaccess` missing in `public_html/frontend/` |
 | Empty portfolio | Database not imported or wrong `DB_*` in `.env` |
 | CV PDF 404 | File at `backend/public/files/hussein-jaber-cv.pdf`; run `storage:link` |
 
