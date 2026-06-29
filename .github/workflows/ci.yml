@@ -35,13 +35,13 @@ jobs:
           cp .env.example .env
           php artisan key:generate --force --no-interaction
 
-      - name: Run tests
-        run: php artisan test
-
       - name: Build admin assets
         run: |
           npm ci
           npm run build
+
+      - name: Run tests
+        run: php artisan test
 
   frontend:
     runs-on: ubuntu-latest
