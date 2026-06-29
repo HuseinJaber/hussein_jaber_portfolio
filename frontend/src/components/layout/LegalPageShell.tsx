@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import Aurora from "@/components/ui/Aurora";
 
 export default function LegalPageShell({
@@ -13,7 +13,7 @@ export default function LegalPageShell({
     <>
       <Aurora />
       <main className="mx-auto max-w-3xl px-4 py-16">
-        <Link href="/" className="text-sm text-muted transition hover:text-white">
+        <Link to="/" className="text-sm text-muted transition hover:text-white">
           ← Back to home
         </Link>
 
@@ -24,13 +24,13 @@ export default function LegalPageShell({
         <div className="mt-10 space-y-8 text-base leading-relaxed text-muted">{children}</div>
 
         <nav className="mt-12 flex flex-wrap gap-x-4 gap-y-2 border-t border-line pt-8 text-sm">
-          <Link href="/privacy" className="text-accent hover:underline">
+          <Link to="/privacy" className="text-accent hover:underline">
             Privacy Policy
           </Link>
-          <Link href="/cookies" className="text-accent hover:underline">
+          <Link to="/cookies" className="text-accent hover:underline">
             Cookie Policy
           </Link>
-          <Link href="/terms" className="text-accent hover:underline">
+          <Link to="/terms" className="text-accent hover:underline">
             Terms of Use
           </Link>
         </nav>

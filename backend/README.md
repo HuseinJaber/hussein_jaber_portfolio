@@ -1,7 +1,7 @@
 # Backend — Laravel API + Admin
 
 Laravel 13 application that powers the portfolio **JSON API** and **Livewire admin
-dashboard**. Shares one MySQL database with the Next.js frontend.
+dashboard**. Shares one MySQL database with the React frontend.
 
 ## Responsibilities
 
@@ -32,7 +32,7 @@ Key variables in `.env.example`:
 | Variable | Purpose |
 | --- | --- |
 | `APP_URL` | Backend public URL (Herd `.test` or `http://localhost:8000`) |
-| `FRONTEND_URL` | Next.js origin — used for CORS |
+| `FRONTEND_URL` | React site origin — used for CORS |
 | `MAIL_*` / `MAIL_OWNER_ADDRESS` | SMTP + inbox for contact/newsletter alerts |
 | `PORTFOLIO_REGISTRATION_ENABLED` | Public sign-up (default `false`) |
 

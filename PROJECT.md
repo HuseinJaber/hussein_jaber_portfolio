@@ -37,13 +37,13 @@ The résumé PDF lives at `backend/public/files/hussein-jaber-cv.pdf` with
 | Database | **MySQL 8** | Requested; ubiquitous on Hostinger |
 | Admin dashboard | **Livewire 3 + Alpine.js + Tailwind** (Blade) | Server-rendered, secure, fast to build, fully component-based |
 | Auth | **Laravel Breeze** (Livewire stack) + **Sanctum** | Session auth for admin; Sanctum ready for future token APIs |
-| Public website | **Next.js 16 (App Router) + React 19 + TypeScript** | SEO-friendly SSR, great DX, modern animations |
+| Public website | **React 19 + Vite + TypeScript** (SPA) | Static build for Hostinger shared hosting; same animations & API |
 | Styling (frontend) | **Tailwind CSS v4 + SCSS** | Utility-first speed + SCSS for richer custom effects |
 | Animation | **Motion (Framer Motion) + GSAP** | Scroll reveals, layout animations, hero timeline |
 
-**Why two apps?** The public site is a decoupled Next.js app consuming a JSON API.
+**Why two apps?** The public site is a decoupled React SPA consuming a JSON API.
 The admin is a classic server-rendered Laravel app. They share one MySQL database —
-marketing site stays fast and SEO-ready; admin stays simple and secure.
+marketing site stays fast on static hosting; admin stays simple and secure.
 
 ---
 
@@ -76,19 +76,20 @@ hussein_jaber_portfolio/
 │   │   └── mail/                   # HTML email templates
 │   └── routes/{web.php, api.php}
 │
-├── frontend/                # Next.js public website
+├── frontend/                # React + Vite public website (SPA)
 │   └── src/
-│       ├── app/             # /, /projects/[slug], /cv, /privacy, /terms, /cookies
+│       ├── pages/           # Home, Project, Cv, Privacy, Terms, Cookies
 │       ├── components/
 │       │   ├── layout/      # Navbar, Footer, ScrollProgress, FooterNewsletter
 │       │   ├── sections/    # Hero, About, Services, Skills, Work, Experience,
 │       │   │                #   Certifications, Testimonials, Contact
-│       │   ├── cv/          # CvDocument, CvPageActions
+│       │   ├── cv/          # CvActions
 │       │   ├── ui/          # Reveal, SectionHeading, Aurora, AnimatedCounter, icons
-│       │   ├── AnalyticsTracker.tsx, CookieConsent.tsx, …
+│       │   ├── AnalyticsTracker.tsx, CookieConsent.tsx, PageMeta.tsx, …
 │       │   └── lib/         # api.ts, types.ts, sections.ts, cv.ts
 │       └── styles/          # aurora.scss
 │
+├── frontend-nextjs-backup/  # Archived Next.js frontend (optional local copy)
 ├── HusseinJaberCV.pdf       # source CV (copy also in backend/public/files/)
 ├── PROJECT.md               # ← you are here
 ├── AGENTS.md                # Operating notes for Cursor agents
@@ -128,7 +129,7 @@ tab for restore. Implemented via `HasCancelled` + `ManagesCancelledRecords`.
 
 ---
 
-## 5. Public API (consumed by the Next.js site)
+## 5. Public API (consumed by the React site)
 
 Base URL: `http://localhost:8000/api` (or your Herd `.test` domain + `/api`)
 
@@ -207,12 +208,12 @@ php artisan serve              # http://localhost:8000 (or use Herd)
 
 # 3. Frontend
 cd ../frontend
-cp .env.example .env.local     # NEXT_PUBLIC_API_URL=http://localhost:8000/api
+cp .env.example .env.local     # VITE_API_URL=http://localhost:8000/api
 npm install
-npm run dev                    # http://localhost:3000
+npm run dev                    # http://localhost:5173
 ```
 
-Open the site at **http://localhost:3000** and the admin at **http://localhost:8000/admin**.
+Open the site at **http://localhost:5173** and the admin at **http://localhost:8000/admin**.
 
 ---
 
@@ -242,67 +243,65 @@ and edited in Admin → Sections. Hero content always comes from Profile fields.
 
 ## 9. Deploying to production
 
+**Hostinger (Premium shared hosting):** see **[HOSTINGER_DEPLOY.md](./HOSTINGER_DEPLOY.md)** for the
+full go-live checklist (`huseinjaber.com` + `api.huseinjaber.com`).
+
 ### First-time server setup
 
-**Backend (Laravel) — shared hosting or VPS:**
+**Backend (Laravel) — Hostinger / shared hosting:**
 
 1. Clone the repo and `cd backend`.
-2. Copy env: `cp .env.example .env` then edit:
+2. Copy env: `cp .env.example .env` (or `cp .env.production.example .env`) then edit:
    - `APP_ENV=production`, `APP_DEBUG=false`
-   - `APP_URL` — public backend URL (e.g. `https://api.yourdomain.com`)
-   - `FRONTEND_URL` — public Next.js URL (e.g. `https://yourdomain.com`) — **required for CORS**
-   - `DB_*` — production MySQL credentials
+   - `APP_URL` — public backend URL (e.g. `https://api.huseinjaber.com`)
+   - `FRONTEND_URL` — public React site URL (e.g. `https://huseinjaber.com`) — **required for CORS**
+   - `DB_*` — production MySQL credentials (Hostinger hPanel)
    - `MAIL_*` and `MAIL_OWNER_ADDRESS` — real SMTP transport
 3. Install and optimize:
    ```bash
    composer install --no-dev --optimize-autoloader
    php artisan key:generate    # first deploy only
-   php artisan migrate --force
    npm ci && npm run build     # admin Vite assets → public/build/
-   php artisan storage:link    # if serving uploaded certification PDFs
+   php artisan storage:link    # certification PDFs + uploads
    php artisan config:cache route:cache view:cache
    ```
-4. Point the web server document root to `backend/public`.
-5. Ensure `storage/` and `bootstrap/cache/` are writable.
+4. **Import** your local database dump via phpMyAdmin (preferred for first deploy), or
+   `php artisan migrate --force` on an empty database only.
+5. Point the **api** subdomain document root to `backend/public`.
+6. Ensure `storage/` and `bootstrap/cache/` are writable.
 
-**Frontend (Next.js):**
+**Frontend (React + Vite) — static files on main domain:**
 
-1. `cd frontend`, copy `cp .env.example .env.local` and set:
-   - `NEXT_PUBLIC_API_URL` — production API (e.g. `https://api.yourdomain.com/api`)
-   - `NEXT_PUBLIC_SITE_URL` — public site URL
-2. Build and run:
+1. On your Mac (or CI), set production env and build:
    ```bash
-   npm ci
+   cd frontend
+   VITE_API_URL=https://api.huseinjaber.com/api \
+   VITE_SITE_URL=https://huseinjaber.com \
    npm run build
-   npm run start    # or pm2 / systemd behind nginx
    ```
-3. **Option B:** Deploy to Vercel/Netlify — set the same env vars in the dashboard.
+2. Upload **everything inside** `frontend/dist/` to `public_html` (includes `.htaccess` for SPA routing).
 
 ### Pulling updates (routine deploy)
 
 ```bash
 git pull origin main
 
-# Backend
+# Backend (on server via SSH)
 cd backend
 composer install --no-dev --optimize-autoloader
 php artisan migrate --force
 npm ci && npm run build
 php artisan config:cache route:cache view:cache
 
-# Frontend
-cd ../frontend
-npm ci
-npm run build
-# restart Node process (pm2 restart portfolio, etc.)
+# Frontend: rebuild with production VITE_* vars, re-upload dist/ to public_html
 ```
 
 ### Hostinger notes
 
-- **Shared hosting:** Laravel in `backend/` with docroot → `public/`; Next.js needs
-  a Node-capable plan or a separate VPS.
-- **VPS:** nginx reverse proxy — frontend on `:3000`, backend on PHP-FPM or `artisan serve` behind proxy.
+- **Premium shared hosting:** Laravel on `api` subdomain; React `dist/` on main domain `public_html`.
+- **VPS:** nginx reverse proxy — optional if you upgrade later.
 - Re-run `php artisan migrate --force` after every pull that includes new migrations.
+- Export local DB before first deploy: `./scripts/export-database.sh`
 
 ### Security checklist
 

@@ -205,6 +205,37 @@ export function enabledMainSections(
   );
 }
 
+/** Drop enabled sections that have nothing to show (e.g. testimonials with no entries). */
+export function visibleMainSections(
+  sections: SectionSettings | undefined,
+  order: SectionKey[] | null | undefined,
+  hasContent: (key: SectionKey) => boolean,
+): SectionKey[] {
+  return enabledMainSections(sections, order).filter(hasContent);
+}
+
+export function visibleNavSections(
+  sections: SectionSettings | undefined,
+  order: SectionKey[] | null | undefined,
+  copy: SectionCopyMap | undefined,
+  hasContent: (key: SectionKey) => boolean,
+) {
+  const resolvedCopy = copy ?? DEFAULT_SECTION_COPY;
+
+  return resolveSectionOrder(order)
+    .filter(
+      (key) =>
+        !NAV_EXCLUDED.has(key) &&
+        isSectionEnabled(sections, key) &&
+        hasContent(key),
+    )
+    .map((key) => ({
+      key,
+      href: `#${key}`,
+      label: resolvedCopy[key].nav_label,
+    }));
+}
+
 export function firstEnabledSectionHref(
   sections: SectionSettings | undefined,
   order?: SectionKey[] | null,

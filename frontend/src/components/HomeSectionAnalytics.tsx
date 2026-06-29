@@ -1,14 +1,12 @@
-"use client";
-
 import { useEffect, useRef } from "react";
-import { usePathname } from "next/navigation";
+import { useLocation } from "react-router-dom";
 import type { SectionSettings } from "@/lib/types";
 import { useAnalyticsConsent } from "@/hooks/useAnalyticsConsent";
 import { trackEvent } from "@/lib/analytics";
 import { isSectionEnabled, TRACKED_SECTIONS } from "@/lib/sections";
 
 export default function HomeSectionAnalytics({ sections }: { sections: SectionSettings }) {
-  const pathname = usePathname();
+  const { pathname } = useLocation();
   const viewedSections = useRef(new Set<string>());
   const enabled = useAnalyticsConsent();
 

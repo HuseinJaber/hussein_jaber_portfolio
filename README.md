@@ -4,7 +4,7 @@ A professional, animated Full Stack Developer portfolio with a content-managed
 admin dashboard.
 
 - **`backend/`** — Laravel 13 API + Livewire/Alpine/Tailwind admin dashboard (MySQL).
-- **`frontend/`** — Next.js 16 (React, TypeScript) public website with Tailwind, SCSS,
+- **`frontend/`** — React 19 + Vite SPA (TypeScript) public website with Tailwind, SCSS,
   Motion & GSAP animations, consuming the Laravel API.
 
 Manage profile, sections, projects, categories, tech stacks, skills, services,
@@ -14,7 +14,7 @@ site after refresh.
 
 ## Features
 
-**Public site:** SSR home page with configurable sections, project detail pages,
+**Public site:** Animated home page with configurable sections, project detail pages,
 category filters on the work grid, live résumé at `/cv`, scroll progress indicator,
 contact form, newsletter signup, cookie consent, privacy/terms pages, and lightweight
 analytics.
@@ -39,7 +39,7 @@ cd backend && composer install && npm install && cp .env.example .env \
 npm run dev        # admin assets — keep running
 php artisan serve  # API + admin (skip if using Herd)
 
-# Frontend (http://localhost:3000)
+# Frontend (http://localhost:5173)
 cd frontend && npm install && cp .env.example .env.local && npm run dev
 ```
 
@@ -57,10 +57,10 @@ cd frontend && npm run lint && npm run build
 
 Do **not** commit `.env` files. Copy from `.env.example` on each environment.
 
-## Production deploy
+## Production deploy (Hostinger)
 
-After `git pull` on the server, follow **[PROJECT.md §9](./PROJECT.md#9-deploying-to-production)** —
-backend migrations + asset build, frontend `npm run build`, env vars, and mail/CORS setup.
+Full step-by-step: **[HOSTINGER_DEPLOY.md](./HOSTINGER_DEPLOY.md)** — GitHub push, database
+export, `api.huseinjaber.com` (Laravel), `huseinjaber.com` (upload `frontend/dist/`).
 
 ## Docs
 
@@ -69,4 +69,5 @@ backend migrations + asset build, frontend `npm run build`, env vars, and mail/C
 | [PROJECT.md](./PROJECT.md) | Architecture, API, admin guide, deployment |
 | [AGENTS.md](./AGENTS.md) | Cursor agent / VM operating notes |
 | [backend/README.md](./backend/README.md) | Laravel app quick reference |
-| [frontend/README.md](./frontend/README.md) | Next.js app quick reference |
+| [HOSTINGER_DEPLOY.md](./HOSTINGER_DEPLOY.md) | Production go-live on Hostinger |
+| [frontend/README.md](./frontend/README.md) | React / Vite app quick reference |

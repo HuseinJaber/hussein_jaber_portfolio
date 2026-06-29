@@ -1,3 +1,4 @@
+import { API_URL } from "./api";
 import type {
   Certification,
   Education,
@@ -12,8 +13,7 @@ import { cvExtras } from "./cv-content";
 export function apiAssetUrl(path: string | null | undefined): string | null {
   if (!path) return null;
   if (path.startsWith("http://") || path.startsWith("https://")) return path;
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api";
-  const base = apiUrl.replace(/\/api\/?$/, "");
+  const base = API_URL.replace(/\/api\/?$/, "");
   return `${base}${path.startsWith("/") ? path : `/${path}`}`;
 }
 

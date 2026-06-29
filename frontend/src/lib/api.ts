@@ -1,7 +1,7 @@
 import type { PortfolioData, Project } from "./types";
 
 export const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api";
+  import.meta.env.VITE_API_URL ?? "http://localhost:8000/api";
 
 /**
  * Fetch the full portfolio payload. `no-store` keeps the public site in sync

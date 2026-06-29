@@ -5,14 +5,16 @@ import { gsap } from "gsap";
 import type { Profile, SocialLink } from "@/lib/types";
 import { AnimatedCounter } from "@/components/ui/AnimatedCounter";
 import { SocialIcon, EmailIcon, LocationIcon, ContactIconBox } from "@/components/ui/icons";
-import { isSectionEnabled } from "@/lib/sections";
+import CvActions from "@/components/cv/CvActions";
 
 export default function Hero({
   profile,
   socials,
+  projectCount,
 }: {
   profile: Profile;
   socials: SocialLink[];
+  projectCount: number;
 }) {
   const root = useRef<HTMLDivElement>(null);
 
@@ -30,17 +32,8 @@ export default function Hero({
 
   const stats = [
     { value: profile.years_experience, label: "Years of experience" },
-    { value: profile.projects_completed, label: "Projects delivered" },
-    { value: profile.happy_clients, label: "Clients served" },
+    { value: projectCount, label: "Projects delivered" },
   ];
-
-  const showContact = isSectionEnabled(profile.sections, "contact");
-  const showWork = isSectionEnabled(profile.sections, "work");
-  const primaryCtaHref = showContact
-    ? "#contact"
-    : profile.email
-      ? `mailto:${profile.email}`
-      : null;
 
   return (
     <section id="home" ref={root} className="relative flex min-h-screen items-center pt-28">
@@ -65,29 +58,8 @@ export default function Hero({
             {profile.headline ?? profile.bio}
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center gap-4">
-            {primaryCtaHref && (
-              <a
-                href={primaryCtaHref}
-                className="hero-cta rounded-xl bg-gradient-to-r from-brand to-brand-2 px-6 py-3 font-semibold text-white shadow-lg shadow-indigo-600/30 transition hover:-translate-y-0.5"
-              >
-                {showContact ? "Start a project" : "Email me"}
-              </a>
-            )}
-            {showWork && (
-              <a
-                href="#work"
-                className="hero-cta rounded-xl border border-line bg-white/5 px-6 py-3 font-semibold transition hover:border-brand"
-              >
-                View portfolio
-              </a>
-            )}
-            <a
-              href="/cv"
-              className="hero-cta rounded-xl border border-line bg-white/5 px-6 py-3 font-semibold transition hover:border-brand"
-            >
-              View résumé
-            </a>
+          <div className="mt-6 flex flex-wrap items-center gap-4">
+            <CvActions resumeUrl={profile.resume_url} />
           </div>
 
           <div className="mt-10 flex gap-3">
@@ -112,7 +84,7 @@ export default function Hero({
 
         <div className="relative">
           <div className="glass glow rounded-3xl p-8">
-            <div className="grid grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 gap-6">
               {stats.map((s, index) => (
                 <div key={s.label} className="text-center">
                   <p className="text-3xl font-bold text-gradient sm:text-4xl">

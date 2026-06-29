@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import {
@@ -82,11 +82,11 @@ export default function CookieConsent() {
                     This site uses essential cookies to remember your choices and optional analytics to
                     understand how visitors use the portfolio (page views and section engagement). No
                     advertising or third-party tracking cookies are used.{" "}
-                    <Link href="/privacy" className="text-accent underline-offset-2 hover:underline">
+                    <Link to="/privacy" className="text-accent underline-offset-2 hover:underline">
                       Privacy policy
                     </Link>
                     {" · "}
-                    <Link href="/cookies" className="text-accent underline-offset-2 hover:underline">
+                    <Link to="/cookies" className="text-accent underline-offset-2 hover:underline">
                       Cookie policy
                     </Link>
                     .

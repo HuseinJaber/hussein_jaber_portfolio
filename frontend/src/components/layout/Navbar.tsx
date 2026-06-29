@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import type { SectionCopyMap, SectionKey, SectionSettings } from "@/lib/types";
-import { enabledNavSections, isSectionEnabled } from "@/lib/sections";
+import { isSectionEnabled, visibleNavSections } from "@/lib/sections";
 import { useHomeScroll } from "@/hooks/useHomeScroll";
 import ScrollProgress from "@/components/layout/ScrollProgress";
 
@@ -14,6 +14,7 @@ export default function Navbar({
   scrollSectionIds,
   sectionCopy,
   email,
+  sectionHasContent,
 }: {
   name: string;
   sections: SectionSettings;
@@ -21,11 +22,12 @@ export default function Navbar({
   scrollSectionIds: SectionKey[];
   sectionCopy: SectionCopyMap;
   email?: string | null;
+  sectionHasContent: (key: SectionKey) => boolean;
 }) {
   const { progress, activeSection } = useHomeScroll(scrollSectionIds);
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
-  const links = enabledNavSections(sections, sectionOrder, sectionCopy);
+  const links = visibleNavSections(sections, sectionOrder, sectionCopy, sectionHasContent);
   const showContactCta = isSectionEnabled(sections, "contact");
   const hireHref = showContactCta ? "#contact" : email ? `mailto:${email}` : undefined;
 

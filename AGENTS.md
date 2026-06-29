@@ -3,7 +3,7 @@
 This repo contains **two apps** that run together:
 
 - `backend/` — Laravel 13 API + Livewire admin dashboard (MySQL).
-- `frontend/` — Next.js 16 public website that reads the Laravel API.
+- `frontend/` — React 19 + Vite public website (SPA) that reads the Laravel API.
 
 For full architecture, local setup, content guide and Hostinger deployment, read
 **[PROJECT.md](./PROJECT.md)**. Standard commands live in each app's
@@ -38,18 +38,18 @@ cd backend && npm run dev                                    # Vite: compiles ad
 - If the admin looks unstyled, the Vite dev server isn't running (or run `npm run build` once).
 - On the owner's Mac, **Laravel Herd** may serve the backend at
   `https://hussein_jaber_portfolio.test` instead of `:8000` — match `APP_URL` in
-  `backend/.env` and `NEXT_PUBLIC_API_URL` in `frontend/.env.local`.
+  `backend/.env` and `VITE_API_URL` in `frontend/.env.local`.
 
 **Run the frontend:**
 ```bash
-cd frontend && npm run dev   # http://localhost:3000
+cd frontend && npm run dev   # http://localhost:5173
 ```
-- The home page is **server-rendered and fetches the Laravel API**, so the backend
-  **must be running** or the page shows a "Backend not reachable" fallback.
-  API base URL is `frontend/.env.local` (`NEXT_PUBLIC_API_URL`).
+- Pages fetch the Laravel API from the browser, so the backend **must be running**
+  or the site shows a "Backend not reachable" fallback.
+  API base URL is `frontend/.env.local` (`VITE_API_URL`).
 
 **Frontend styling gotcha:** Tailwind v4 auto-generates utilities from the
-`@theme` block in `src/app/globals.css` (e.g. `--color-muted` → `text-muted`,
+`@theme` block in `src/globals.css` (e.g. `--color-muted` → `text-muted`,
 `--color-brand` → `bg-brand`). Use those generated class names — do **not** use
 arbitrary `text-[--color-muted]` syntax.
 
@@ -86,6 +86,11 @@ existing duplicates — run `php artisan migrate` on stale databases.
 - Backend: `cd backend && php artisan test`  ·  format: `./vendor/bin/pint`
 - Frontend: `cd frontend && npm run lint && npm run build`
 - CI: `.github/workflows/ci.yml` runs both on push/PR to `main`.
+
+**Next.js backup:** Original Next.js frontend archived at `frontend-nextjs-backup.zip`.
+
+**Hostinger deploy:** See **[HOSTINGER_DEPLOY.md](./HOSTINGER_DEPLOY.md)** — build frontend,
+upload `dist/` to `public_html`, Laravel on `api.huseinjaber.com`.
 
 **Content:** Profile, experience, certifications and core copy are seeded from the
 owner's CV in `DatabaseSeeder.php`. ~90 projects are imported from local dev

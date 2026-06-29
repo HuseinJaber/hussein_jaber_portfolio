@@ -1,9 +1,10 @@
+import { Link } from "react-router-dom";
 import type { Profile, SectionCopy, SocialLink } from "@/lib/types";
 import { SocialIcon } from "@/components/ui/icons";
 import CookieSettingsLink from "@/components/CookieSettingsLink";
 import FooterNewsletter from "@/components/layout/FooterNewsletter";
 import { isSectionEnabled } from "@/lib/sections";
-import Link from "next/link";
+import { apiAssetUrl } from "@/lib/cv";
 
 export default function Footer({
   profile,
@@ -14,6 +15,8 @@ export default function Footer({
   socials: SocialLink[];
   newsletterCopy: SectionCopy;
 }) {
+  const pdfUrl = apiAssetUrl(profile.resume_url);
+
   return (
     <footer className="border-t border-line pt-8">
       {isSectionEnabled(profile.sections, "newsletter") && (
@@ -50,19 +53,33 @@ export default function Footer({
             © {new Date().getFullYear()} {profile.name}. All rights reserved.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 sm:justify-end">
-            <Link href="/cv" className="text-xs text-muted underline-offset-2 transition hover:text-white hover:underline">
-              Résumé
+            <Link to="/cv" className="text-xs text-muted underline-offset-2 transition hover:text-white hover:underline">
+              View résumé
             </Link>
+            {pdfUrl && (
+              <>
+                <span className="text-xs text-line">·</span>
+                <a
+                  href={pdfUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download
+                  className="text-xs text-muted underline-offset-2 transition hover:text-white hover:underline"
+                >
+                  Download CV
+                </a>
+              </>
+            )}
             <span className="text-xs text-line">·</span>
-            <Link href="/privacy" className="text-xs text-muted underline-offset-2 transition hover:text-white hover:underline">
+            <Link to="/privacy" className="text-xs text-muted underline-offset-2 transition hover:text-white hover:underline">
               Privacy
             </Link>
             <span className="text-xs text-line">·</span>
-            <Link href="/cookies" className="text-xs text-muted underline-offset-2 transition hover:text-white hover:underline">
+            <Link to="/cookies" className="text-xs text-muted underline-offset-2 transition hover:text-white hover:underline">
               Cookies
             </Link>
             <span className="text-xs text-line">·</span>
-            <Link href="/terms" className="text-xs text-muted underline-offset-2 transition hover:text-white hover:underline">
+            <Link to="/terms" className="text-xs text-muted underline-offset-2 transition hover:text-white hover:underline">
               Terms
             </Link>
             <span className="text-xs text-line">·</span>

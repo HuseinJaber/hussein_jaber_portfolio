@@ -1,12 +1,10 @@
-"use client";
-
 import { useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { useLocation } from "react-router-dom";
 import { useAnalyticsConsent } from "@/hooks/useAnalyticsConsent";
 import { trackEvent } from "@/lib/analytics";
 
 export default function AnalyticsTracker() {
-  const pathname = usePathname();
+  const { pathname } = useLocation();
   const enabled = useAnalyticsConsent();
 
   useEffect(() => {

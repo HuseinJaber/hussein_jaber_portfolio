@@ -1,0 +1,55 @@
+// Animated aurora / grid background — authored in SCSS to demonstrate the
+// SCSS pipeline working alongside Tailwind.
+
+@use "sass:map";
+
+$blob-size: 42rem;
+$blobs: (
+  one: (top: -10%, left: -5%, color: rgba(99, 102, 241, 0.45), delay: 0s),
+  two: (top: 20%, left: 60%, color: rgba(168, 85, 247, 0.40), delay: -6s),
+  three: (top: 60%, left: 10%, color: rgba(34, 211, 238, 0.30), delay: -12s),
+);
+
+.aurora {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgba(99, 102, 241, 0.12), transparent 60%);
+
+  &__grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 100%);
+  }
+
+  &__blob {
+    position: absolute;
+    width: $blob-size;
+    height: $blob-size;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.7;
+    animation: aurora-float 22s ease-in-out infinite;
+  }
+
+  @each $name, $cfg in $blobs {
+    &__blob--#{$name} {
+      top: map.get($cfg, top);
+      left: map.get($cfg, left);
+      background: map.get($cfg, color);
+      animation-delay: map.get($cfg, delay);
+    }
+  }
+}
+
+@keyframes aurora-float {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  33% { transform: translate3d(4%, 6%, 0) scale(1.08); }
+  66% { transform: translate3d(-5%, -4%, 0) scale(0.96); }
+}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "motion/react";
 import type { Project, SectionCopy } from "@/lib/types";
 import SectionHeading from "@/components/ui/SectionHeading";
@@ -17,12 +17,11 @@ const engagementLabels: Record<Project["engagement_type"], string> = {
 function ProjectCard({ project }: { project: Project }) {
   return (
     <Link
-      href={`/projects/${project.slug}`}
+      to={`/projects/${project.slug}`}
       className="group block h-full overflow-hidden rounded-2xl border border-line bg-white/[0.02] transition hover:-translate-y-1 hover:border-brand"
     >
       <div className="relative h-40 overflow-hidden bg-gradient-to-br from-surface-2 to-surface sm:h-44">
         {project.cover_image ? (
-          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={project.cover_image}
             alt={project.title}

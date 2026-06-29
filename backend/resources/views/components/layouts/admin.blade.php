@@ -65,6 +65,10 @@
                     View site
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                 </a>
+                <a href="{{ route('profile') }}"
+                   class="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-white/10 px-3 py-1.5 text-sm hover:bg-slate-50 dark:hover:bg-white/5">
+                    Account
+                </a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button class="rounded-lg bg-slate-900 dark:bg-white/10 px-3 py-1.5 text-sm font-medium text-white">Logout</button>
