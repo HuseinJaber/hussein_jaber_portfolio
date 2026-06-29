@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Certification;
 use App\Models\Education;
 use App\Models\Experience;
 use App\Models\Profile;
@@ -24,9 +25,13 @@ class PortfolioController extends Controller
             'socials' => SocialLink::active()->orderBy('sort_order')->get(),
             'skills' => Skill::active()->orderBy('sort_order')->get(),
             'services' => Service::active()->orderBy('sort_order')->get(),
-            'experiences' => Experience::orderByDesc('sort_order')->get(),
-            'education' => Education::orderByDesc('sort_order')->get(),
-            'projects' => Project::published()->orderBy('sort_order')->get(),
+            'experiences' => Experience::notCancelled()->orderBy('sort_order')->withCount(['projects' => fn ($q) => $q->published()])->get(),
+            'education' => Education::notCancelled()->orderBy('sort_order')->get(),
+            'certifications' => Certification::published()->orderBy('sort_order')->get(),
+            'projects' => Project::published()
+                ->with(['experience:id,company,role', 'projectCategories:id,name', 'techStacks:id,name'])
+                ->orderBy('sort_order')
+                ->get(),
             'testimonials' => Testimonial::published()->orderBy('sort_order')->get(),
         ]);
     }
@@ -34,13 +39,19 @@ class PortfolioController extends Controller
     public function projects()
     {
         return response()->json(
-            Project::published()->orderBy('sort_order')->get()
+            Project::published()
+                ->with(['experience:id,company,role', 'projectCategories:id,name', 'techStacks:id,name'])
+                ->orderBy('sort_order')
+                ->get()
         );
     }
 
     public function project(string $slug)
     {
-        $project = Project::published()->where('slug', $slug)->firstOrFail();
+        $project = Project::published()
+            ->with(['experience:id,company,role', 'projectCategories:id,name', 'techStacks:id,name'])
+            ->where('slug', $slug)
+            ->firstOrFail();
 
         return response()->json($project);
     }

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { getPortfolio } from "@/lib/api";
+import AnalyticsTracker from "@/components/AnalyticsTracker";
+import CookieConsent from "@/components/CookieConsent";
 
 const sans = Plus_Jakarta_Sans({
   variable: "--font-sans",
@@ -33,7 +35,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${sans.variable} antialiased`}>
-      <body>{children}</body>
+      <body>
+        <AnalyticsTracker />
+        <CookieConsent />
+        {children}
+      </body>
     </html>
   );
 }

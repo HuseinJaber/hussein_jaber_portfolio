@@ -2,6 +2,8 @@
 
 namespace App\Livewire\Admin;
 
+use App\Livewire\Concerns\ManagesCancelledRecords;
+use App\Livewire\Concerns\ReordersRecords;
 use App\Models\Education;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -11,9 +13,11 @@ use Livewire\Component;
 #[Title('Education')]
 class EducationManager extends Component
 {
-    public bool $showForm = false;
+    use ManagesCancelledRecords, ReordersRecords;
 
     public ?int $editingId = null;
+
+    public bool $creatingNew = false;
 
     public string $degree = '';
 
@@ -27,7 +31,10 @@ class EducationManager extends Component
 
     public string $description = '';
 
-    public int $sort_order = 0;
+    protected function sortableModelClass(): string
+    {
+        return Education::class;
+    }
 
     protected function rules(): array
     {
@@ -38,19 +45,19 @@ class EducationManager extends Component
             'start_date' => 'nullable|string|max:40',
             'end_date' => 'nullable|string|max:40',
             'description' => 'nullable|string|max:2000',
-            'sort_order' => 'integer',
         ];
     }
 
     public function create(): void
     {
         $this->resetForm();
-        $this->showForm = true;
+        $this->creatingNew = true;
     }
 
     public function edit(int $id): void
     {
         $e = Education::findOrFail($id);
+        $this->creatingNew = false;
         $this->editingId = $e->id;
         $this->degree = $e->degree;
         $this->institution = $e->institution;
@@ -58,8 +65,7 @@ class EducationManager extends Component
         $this->start_date = (string) $e->start_date;
         $this->end_date = (string) $e->end_date;
         $this->description = (string) $e->description;
-        $this->sort_order = $e->sort_order;
-        $this->showForm = true;
+        $this->resetValidation();
     }
 
     public function save(): void
@@ -69,36 +75,43 @@ class EducationManager extends Component
             Education::findOrFail($this->editingId)->update($data);
             session()->flash('status', 'Education updated.');
         } else {
+            $data['sort_order'] = Education::nextSortOrder();
             Education::create($data);
             session()->flash('status', 'Education created.');
         }
         $this->resetForm();
-        $this->showForm = false;
     }
 
     public function delete(int $id): void
     {
-        Education::findOrFail($id)->delete();
-        session()->flash('status', 'Education deleted.');
+        Education::findOrFail($id)->cancelRecord();
+        if ($this->editingId === $id) {
+            $this->resetForm();
+        }
+        session()->flash('status', 'Education cancelled.');
+    }
+
+    public function restore(int $id): void
+    {
+        Education::cancelledOnly()->findOrFail($id)->restoreRecord();
+        session()->flash('status', 'Education restored.');
     }
 
     public function cancel(): void
     {
         $this->resetForm();
-        $this->showForm = false;
     }
 
     private function resetForm(): void
     {
-        $this->reset(['editingId', 'degree', 'institution', 'location', 'start_date', 'end_date', 'description']);
-        $this->sort_order = 0;
+        $this->reset(['editingId', 'creatingNew', 'degree', 'institution', 'location', 'start_date', 'end_date', 'description']);
         $this->resetValidation();
     }
 
     public function render()
     {
         return view('livewire.admin.education-manager', [
-            'educations' => Education::orderByDesc('sort_order')->get(),
+            'educations' => $this->cancelledQuery(Education::query())->orderBy('sort_order')->get(),
         ]);
     }
 }

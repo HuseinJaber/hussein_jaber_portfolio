@@ -2,16 +2,17 @@
 
 namespace Database\Seeders;
 
+use App\Models\Certification;
 use App\Models\ContactMessage;
 use App\Models\Education;
 use App\Models\Experience;
 use App\Models\Profile;
-use App\Models\Project;
 use App\Models\Service;
 use App\Models\Skill;
 use App\Models\SocialLink;
 use App\Models\Testimonial;
 use App\Models\User;
+use App\Support\PortfolioSections;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -27,53 +28,57 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Hussein Jaber',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
+                'is_admin' => true,
             ]
         );
 
         // ---- Profile (singleton) ----------------------------------------
         Profile::updateOrCreate(['id' => 1], [
             'name' => 'Hussein Jaber',
-            'title' => 'Full Stack Developer',
-            'headline' => 'I build fast, secure & beautiful web applications that grow your business.',
-            'bio' => 'Full Stack Developer specialising in Laravel and modern JavaScript frameworks. I help startups and businesses turn ideas into polished, production-ready products.',
-            'about' => "I'm a passionate Full Stack Developer with a strong focus on crafting high-performance, secure and maintainable web applications. From elegant front-end experiences to robust back-end architecture, I take ownership of the full product lifecycle.\n\nI love working closely with clients to understand their goals and deliver solutions that not only look great but also drive real results. Let's build something remarkable together.",
-            'email' => 'hello@huseinjaber.com',
-            'phone' => '+961 70 000 000',
+            'title' => 'Laravel Full Stack Developer',
+            'headline' => 'I design and build high-performance Laravel web applications — from e-commerce stores to corporate platforms — with clean PHP backends and modern JavaScript frontends.',
+            'bio' => 'Laravel developer at TheWebAddicts in Beirut. I specialize in Laravel, Livewire, and PHP for e-commerce, corporate websites, and custom web applications — with JavaScript where the UI needs it.',
+            'about' => "I'm a Laravel-focused Full Stack Developer based in Beirut, Lebanon, with a BSc in Computer Science from the Lebanese International University. Since graduating in 2022, I've progressed from GIS and JavaScript internships at Khatib & Alami and Helbawi Group into full-time Laravel development at TheWebAddicts, where I build and maintain applications for regional and international brands.\n\nMy work centers on Laravel — Livewire and Filament admin panels, REST APIs, e-commerce flows, search, payments, and deployment — complemented by JavaScript and Tailwind CSS on the frontend when projects call for it.\n\nWhether you need a new Laravel e-commerce platform, a corporate website, or ongoing support for an existing application, I focus on clean architecture, performance, and clear business outcomes.",
+            'email' => 'HusseinJaber5@hotmail.com',
+            'phone' => '+961 70 004 893',
             'location' => 'Beirut, Lebanon',
             'resume_url' => '/files/hussein-jaber-cv.pdf',
-            'years_experience' => 5,
-            'projects_completed' => 48,
-            'happy_clients' => 32,
+            'years_experience' => 3,
+            'projects_completed' => 90,
+            'happy_clients' => 40,
             'available_for_work' => true,
-            'meta_title' => 'Hussein Jaber — Full Stack Developer',
-            'meta_description' => 'Full Stack Developer building fast, secure and beautiful web applications with Laravel, React and Next.js.',
+            'meta_title' => 'Hussein Jaber | Laravel Full Stack Developer',
+            'meta_description' => 'Hussein Jaber is a Laravel developer in Beirut, Lebanon, building secure e-commerce platforms, corporate websites, and custom web applications with PHP, Livewire, and JavaScript.',
+            'section_copy' => PortfolioSections::defaultCopy(),
         ]);
 
         // ---- Social links ------------------------------------------------
         $socials = [
             ['platform' => 'github', 'label' => 'GitHub', 'url' => 'https://github.com/HuseinJaber', 'icon' => 'github', 'sort_order' => 1],
-            ['platform' => 'linkedin', 'label' => 'LinkedIn', 'url' => 'https://linkedin.com/in/huseinjaber', 'icon' => 'linkedin', 'sort_order' => 2],
-            ['platform' => 'twitter', 'label' => 'X / Twitter', 'url' => 'https://twitter.com/huseinjaber', 'icon' => 'twitter', 'sort_order' => 3],
-            ['platform' => 'whatsapp', 'label' => 'WhatsApp', 'url' => 'https://wa.me/96170000000', 'icon' => 'whatsapp', 'sort_order' => 4],
+            ['platform' => 'linkedin', 'label' => 'LinkedIn', 'url' => 'https://www.linkedin.com/in/husseinjaberr/', 'icon' => 'linkedin', 'sort_order' => 2],
+            ['platform' => 'facebook', 'label' => 'Facebook', 'url' => 'https://www.facebook.com/hussein.jaber.7505/', 'icon' => 'facebook', 'sort_order' => 3],
+            ['platform' => 'whatsapp', 'label' => 'WhatsApp', 'url' => 'https://wa.me/96170004893', 'icon' => 'whatsapp', 'sort_order' => 4],
         ];
         foreach ($socials as $s) {
             SocialLink::updateOrCreate(['platform' => $s['platform']], $s);
         }
+        SocialLink::where('platform', 'twitter')->delete();
 
         // ---- Skills ------------------------------------------------------
         $skills = [
             ['name' => 'Laravel', 'category' => 'Backend', 'level' => 95, 'icon' => 'laravel'],
-            ['name' => 'PHP', 'category' => 'Backend', 'level' => 92, 'icon' => 'php'],
-            ['name' => 'MySQL', 'category' => 'Backend', 'level' => 88, 'icon' => 'mysql'],
+            ['name' => 'PHP', 'category' => 'Backend', 'level' => 93, 'icon' => 'php'],
+            ['name' => 'Livewire', 'category' => 'Backend', 'level' => 90, 'icon' => 'livewire'],
             ['name' => 'REST APIs', 'category' => 'Backend', 'level' => 90, 'icon' => 'api'],
+            ['name' => 'MySQL', 'category' => 'Backend', 'level' => 88, 'icon' => 'mysql'],
+            ['name' => 'Filament', 'category' => 'Backend', 'level' => 85, 'icon' => 'laravel'],
             ['name' => 'React', 'category' => 'Frontend', 'level' => 90, 'icon' => 'react'],
-            ['name' => 'Next.js', 'category' => 'Frontend', 'level' => 88, 'icon' => 'nextjs'],
-            ['name' => 'TypeScript', 'category' => 'Frontend', 'level' => 85, 'icon' => 'typescript'],
-            ['name' => 'Tailwind CSS', 'category' => 'Frontend', 'level' => 93, 'icon' => 'tailwind'],
-            ['name' => 'Livewire', 'category' => 'Frontend', 'level' => 87, 'icon' => 'livewire'],
-            ['name' => 'Alpine.js', 'category' => 'Frontend', 'level' => 84, 'icon' => 'alpine'],
-            ['name' => 'Docker', 'category' => 'DevOps', 'level' => 80, 'icon' => 'docker'],
+            ['name' => 'TypeScript', 'category' => 'Frontend', 'level' => 82, 'icon' => 'typescript'],
+            ['name' => 'Tailwind CSS', 'category' => 'Frontend', 'level' => 92, 'icon' => 'tailwind'],
+            ['name' => 'JavaScript', 'category' => 'Frontend', 'level' => 90, 'icon' => 'react'],
+            ['name' => 'WordPress', 'category' => 'CMS', 'level' => 78, 'icon' => 'wordpress'],
             ['name' => 'Git', 'category' => 'DevOps', 'level' => 90, 'icon' => 'git'],
+            ['name' => 'Docker', 'category' => 'DevOps', 'level' => 75, 'icon' => 'docker'],
         ];
         foreach ($skills as $i => $s) {
             Skill::updateOrCreate(
@@ -81,15 +86,16 @@ class DatabaseSeeder extends Seeder
                 array_merge($s, ['sort_order' => $i + 1, 'is_active' => true])
             );
         }
+        Skill::whereNotIn('name', collect($skills)->pluck('name'))->delete();
 
         // ---- Services ----------------------------------------------------
         $services = [
-            ['title' => 'Web Application Development', 'icon' => 'code', 'description' => 'Custom, scalable web applications built with Laravel and modern JavaScript frameworks — tailored exactly to your business needs.'],
-            ['title' => 'API Development & Integration', 'icon' => 'plug', 'description' => 'Secure, well-documented REST & JSON APIs and third-party integrations (payments, CRMs, social, AI).'],
-            ['title' => 'Frontend & UI/UX', 'icon' => 'sparkles', 'description' => 'Pixel-perfect, responsive and animated interfaces using React, Next.js, Tailwind CSS and GSAP.'],
-            ['title' => 'E-commerce Solutions', 'icon' => 'cart', 'description' => 'Complete online stores with payments, inventory and dashboards that are fast and easy to manage.'],
-            ['title' => 'Performance & Security', 'icon' => 'shield', 'description' => 'Auditing, hardening and optimising existing applications for speed, SEO and security best practices.'],
-            ['title' => 'Maintenance & Support', 'icon' => 'wrench', 'description' => 'Ongoing support, feature development and reliable maintenance so your product keeps growing.'],
+            ['title' => 'E-commerce Development', 'icon' => 'cart', 'description' => 'Build conversion-focused online stores with Laravel — product catalogues, secure checkout, payment gateways, search, and admin dashboards that scale with your business.'],
+            ['title' => 'Corporate & Brand Websites', 'icon' => 'sparkles', 'description' => 'Launch polished, SEO-ready corporate sites with content management, multilingual support, and performant Livewire admin panels.'],
+            ['title' => 'Web Application Development', 'icon' => 'code', 'description' => 'Custom Laravel applications designed around your workflow — internal tools, customer portals, and SaaS-style platforms built for growth.'],
+            ['title' => 'API Development & Integration', 'icon' => 'plug', 'description' => 'Robust REST APIs that connect your product to payment processors, CRMs, search engines, and third-party services — securely and reliably.'],
+            ['title' => 'Frontend & UI Engineering', 'icon' => 'sparkles', 'description' => 'Responsive, accessible JavaScript interfaces with Tailwind CSS and Livewire — fast load times, smooth interactions, and mobile-first design.'],
+            ['title' => 'Maintenance & Support', 'icon' => 'wrench', 'description' => 'Dependable post-launch care — bug fixes, feature updates, and performance improvements so your application stays secure and competitive.'],
         ];
         foreach ($services as $i => $s) {
             Service::updateOrCreate(
@@ -98,98 +104,83 @@ class DatabaseSeeder extends Seeder
             );
         }
 
-        // ---- Projects ----------------------------------------------------
-        $projects = [
-            [
-                'title' => 'NovaShop — E-commerce Platform',
-                'category' => 'E-commerce',
-                'short_description' => 'A full-featured online store with Stripe payments and an admin dashboard.',
-                'description' => 'NovaShop is a complete e-commerce platform featuring product management, cart, checkout with Stripe, order tracking and a powerful admin dashboard. Built for speed and scale.',
-                'tech_stack' => ['Laravel', 'Next.js', 'MySQL', 'Stripe', 'Tailwind CSS'],
-                'live_url' => 'https://example.com',
-                'source_url' => 'https://github.com/HuseinJaber',
-                'client' => 'NovaShop Inc.',
-                'year' => 2025,
-                'is_featured' => true,
-            ],
-            [
-                'title' => 'TaskFlow — SaaS Project Manager',
-                'category' => 'SaaS',
-                'short_description' => 'Real-time team collaboration and project management SaaS.',
-                'description' => 'TaskFlow helps teams plan, track and ship work with boards, real-time updates, role-based access and analytics. Built with a Laravel API and a React front-end.',
-                'tech_stack' => ['Laravel', 'React', 'WebSockets', 'MySQL', 'Redis'],
-                'live_url' => 'https://example.com',
-                'source_url' => 'https://github.com/HuseinJaber',
-                'client' => 'TaskFlow',
-                'year' => 2024,
-                'is_featured' => true,
-            ],
-            [
-                'title' => 'Medina — Restaurant Booking',
-                'category' => 'Web',
-                'short_description' => 'Reservation and menu management system for restaurants.',
-                'description' => 'A booking platform allowing customers to reserve tables, browse menus and leave reviews, with a management dashboard for staff.',
-                'tech_stack' => ['Laravel', 'Livewire', 'Alpine.js', 'Tailwind CSS'],
-                'live_url' => 'https://example.com',
-                'client' => 'Medina Restaurant',
-                'year' => 2024,
-                'is_featured' => true,
-            ],
-            [
-                'title' => 'Pulse — Analytics Dashboard',
-                'category' => 'Dashboard',
-                'short_description' => 'A real-time analytics dashboard with beautiful charts.',
-                'description' => 'Pulse aggregates data from multiple sources into a single, fast and elegant dashboard with customisable widgets and exports.',
-                'tech_stack' => ['Next.js', 'TypeScript', 'Laravel', 'Chart.js'],
-                'live_url' => 'https://example.com',
-                'client' => 'Pulse Analytics',
-                'year' => 2023,
-                'is_featured' => false,
-            ],
-        ];
-        foreach ($projects as $i => $p) {
-            Project::updateOrCreate(
-                ['slug' => Str::slug($p['title'])],
-                array_merge($p, ['sort_order' => $i + 1, 'is_published' => true])
-            );
-        }
+        // ---- Experience (before projects so portfolio work can link to employer) -
+        Experience::whereIn('company', ['TechWave Solutions', 'Creative Agency', 'Freelance'])->delete();
 
-        // ---- Experience --------------------------------------------------
         $experiences = [
-            ['role' => 'Senior Full Stack Developer', 'company' => 'Freelance', 'location' => 'Remote', 'start_date' => '2022', 'end_date' => 'Present', 'is_current' => true, 'description' => 'Designing and delivering end-to-end web applications for international clients using Laravel, React and Next.js.'],
-            ['role' => 'Full Stack Developer', 'company' => 'TechWave Solutions', 'location' => 'Beirut, Lebanon', 'start_date' => '2020', 'end_date' => '2022', 'is_current' => false, 'description' => 'Built and maintained SaaS products and e-commerce platforms, led front-end architecture and mentored junior developers.'],
-            ['role' => 'Web Developer', 'company' => 'Creative Agency', 'location' => 'Beirut, Lebanon', 'start_date' => '2019', 'end_date' => '2020', 'is_current' => false, 'description' => 'Developed responsive marketing websites and custom WordPress and Laravel solutions for diverse clients.'],
+            [
+                'role' => 'Full Stack Developer',
+                'company' => 'TheWebAddicts',
+                'location' => 'Beirut, Lebanon',
+                'start_date' => 'Jun 2023',
+                'end_date' => 'Present',
+                'is_current' => true,
+                'description' => 'Lead Laravel development for e-commerce platforms, corporate websites, and web applications serving regional brands. Own Livewire and Filament admin panels, JavaScript frontends, REST APIs, search, payments, and production deployments.',
+            ],
+            [
+                'role' => 'Web Developer — Internship',
+                'company' => 'Helbawi Group',
+                'location' => 'Beirut, Lebanon',
+                'start_date' => 'Oct 2022',
+                'end_date' => 'Dec 2022',
+                'is_current' => false,
+                'description' => 'Developed production web applications using Node.js and JavaScript with HTML5 and CSS under senior developer mentorship.',
+            ],
+            [
+                'role' => 'ArcGIS Web Developer — Internship',
+                'company' => 'Khatib & Alami',
+                'location' => 'Beirut, Lebanon',
+                'start_date' => 'Aug 2022',
+                'end_date' => 'Oct 2022',
+                'is_current' => false,
+                'description' => 'Built interactive mapping and GIS web solutions using JavaScript, ArcGIS products, web services APIs, and SQL for engineering and infrastructure clients.',
+            ],
         ];
         foreach ($experiences as $i => $e) {
             Experience::updateOrCreate(
                 ['role' => $e['role'], 'company' => $e['company']],
-                array_merge($e, ['sort_order' => $i + 1])
+                array_merge($e, ['sort_order' => count($experiences) - $i])
             );
         }
+
+        // ---- Projects (all folders in /Library/WebServer/Documents) -----
+        $this->call(DocumentProjectsSeeder::class);
 
         // ---- Education ---------------------------------------------------
+        Education::where('institution', 'Lebanese University')->delete();
+
         Education::updateOrCreate(
-            ['degree' => 'BSc in Computer Science', 'institution' => 'Lebanese University'],
-            ['location' => 'Beirut, Lebanon', 'start_date' => '2015', 'end_date' => '2019', 'description' => 'Focused on software engineering, algorithms and web technologies.', 'sort_order' => 1]
+            ['degree' => 'BSc in Computer Science', 'institution' => 'Lebanese International University'],
+            [
+                'location' => 'Beirut, Lebanon',
+                'start_date' => 'Sep 2019',
+                'end_date' => 'Jun 2022',
+                'description' => 'Bachelor of Science in Computer Science (CSCI). Coursework in software engineering, web technologies, algorithms, and applied problem solving.',
+                'sort_order' => 1,
+            ]
         );
 
-        // ---- Testimonials ------------------------------------------------
-        $testimonials = [
-            ['name' => 'Sarah Mitchell', 'role' => 'CEO', 'company' => 'NovaShop Inc.', 'content' => 'Hussein delivered our e-commerce platform ahead of schedule and exceeded every expectation. Highly professional and a pleasure to work with.', 'rating' => 5],
-            ['name' => 'David Chen', 'role' => 'Founder', 'company' => 'TaskFlow', 'content' => 'The quality of the code and attention to detail were outstanding. Our SaaS is fast, reliable and our users love it.', 'rating' => 5],
-            ['name' => 'Layla Haddad', 'role' => 'Owner', 'company' => 'Medina Restaurant', 'content' => 'Our booking system transformed how we run the restaurant. Communication was clear and the result is beautiful.', 'rating' => 5],
+        // ---- Certifications (from LinkedIn) ------------------------------
+        $certifications = [
+            ['title' => 'Front End Development Libraries', 'issuer' => 'freeCodeCamp', 'issued_at' => 'May 2023', 'credential_url' => 'https://www.freecodecamp.org/certification/HusseinJaber/front-end-development-libraries'],
+            ['title' => 'JavaScript Algorithms and Data Structures', 'issuer' => 'freeCodeCamp', 'issued_at' => 'Apr 2023', 'credential_url' => 'https://www.freecodecamp.org/certification/HusseinJaber/javascript-algorithms-and-data-structures'],
+            ['title' => 'Responsive Web Design', 'issuer' => 'freeCodeCamp', 'issued_at' => 'Apr 2023', 'credential_url' => 'https://www.freecodecamp.org/certification/HusseinJaber/responsive-web-design'],
+            ['title' => 'Freelance Apprenticeship in Web Development', 'issuer' => 'Mercy Corps', 'issued_at' => 'Jan 2023', 'credential_url' => null],
+            ['title' => 'Basics of JavaScript Web Apps', 'issuer' => 'Esri', 'issued_at' => 'Aug 2022', 'credential_url' => 'https://www.esri.com/training/TrainingRecord/Certificate/HusseinJaber/6305fbc3511285490d511f96/-180'],
+            ['title' => 'GIS Basics', 'issuer' => 'Esri', 'issued_at' => 'Aug 2022', 'credential_url' => 'https://www.esri.com/training/TrainingRecord/Certificate/HusseinJaber/62e8b3069953847430627f6b/-180'],
+            ['title' => 'HTML, CSS, and Javascript for Web Developers', 'issuer' => 'Coursera', 'issued_at' => 'Jun 2022', 'credential_url' => 'https://www.coursera.org/account/accomplishments/certificate/HDCPXZZQED7E'],
         ];
-        foreach ($testimonials as $i => $t) {
-            Testimonial::updateOrCreate(
-                ['name' => $t['name'], 'company' => $t['company']],
-                array_merge($t, ['sort_order' => $i + 1, 'is_published' => true])
+        foreach ($certifications as $i => $cert) {
+            Certification::updateOrCreate(
+                ['title' => $cert['title'], 'issuer' => $cert['issuer']],
+                array_merge($cert, ['sort_order' => $i + 1, 'is_published' => true])
             );
         }
 
-        // ---- Sample contact message --------------------------------------
-        ContactMessage::firstOrCreate(
-            ['email' => 'prospect@example.com'],
-            ['name' => 'Potential Client', 'subject' => 'Need a website', 'message' => 'Hi Hussein, I would love to discuss building a website for my business.', 'is_read' => false]
-        );
+        // ---- Testimonials: remove placeholders (add real ones via admin) -
+        Testimonial::whereIn('name', ['Sarah Mitchell', 'David Chen', 'Layla Haddad'])->delete();
+
+        // ---- Remove sample contact message -------------------------------
+        ContactMessage::where('email', 'prospect@example.com')->delete();
     }
 }

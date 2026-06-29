@@ -1,5 +1,5 @@
 <div>
-    <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+    <div class="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-6">
         @foreach ($stats as $stat)
             <a href="{{ route($stat['route']) }}" wire:navigate
                class="group rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 p-5 shadow-sm transition hover:shadow-md">

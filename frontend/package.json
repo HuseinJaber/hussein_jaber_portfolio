@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "NODE_EXTRA_CA_CERTS=\"$HOME/Library/Application Support/Herd/config/valet/CA/LaravelValetCASelfSigned.pem\" next dev",
+    "build": "NODE_EXTRA_CA_CERTS=\"$HOME/Library/Application Support/Herd/config/valet/CA/LaravelValetCASelfSigned.pem\" next build",
     "start": "next start",
     "lint": "eslint"
   },

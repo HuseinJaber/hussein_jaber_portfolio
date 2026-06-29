@@ -2,6 +2,8 @@
 
 namespace App\Livewire\Admin;
 
+use App\Livewire\Concerns\ManagesCancelledRecords;
+use App\Livewire\Concerns\ReordersRecords;
 use App\Models\Experience;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -11,9 +13,11 @@ use Livewire\Component;
 #[Title('Experience')]
 class ExperienceManager extends Component
 {
-    public bool $showForm = false;
+    use ManagesCancelledRecords, ReordersRecords;
 
     public ?int $editingId = null;
+
+    public bool $creatingNew = false;
 
     public string $role = '';
 
@@ -29,7 +33,10 @@ class ExperienceManager extends Component
 
     public string $description = '';
 
-    public int $sort_order = 0;
+    protected function sortableModelClass(): string
+    {
+        return Experience::class;
+    }
 
     protected function rules(): array
     {
@@ -41,19 +48,19 @@ class ExperienceManager extends Component
             'end_date' => 'nullable|string|max:40',
             'is_current' => 'boolean',
             'description' => 'nullable|string|max:2000',
-            'sort_order' => 'integer',
         ];
     }
 
     public function create(): void
     {
         $this->resetForm();
-        $this->showForm = true;
+        $this->creatingNew = true;
     }
 
     public function edit(int $id): void
     {
         $e = Experience::findOrFail($id);
+        $this->creatingNew = false;
         $this->editingId = $e->id;
         $this->role = $e->role;
         $this->company = $e->company;
@@ -62,48 +69,58 @@ class ExperienceManager extends Component
         $this->end_date = (string) $e->end_date;
         $this->is_current = $e->is_current;
         $this->description = (string) $e->description;
-        $this->sort_order = $e->sort_order;
-        $this->showForm = true;
+        $this->resetValidation();
     }
 
     public function save(): void
     {
         $data = $this->validate();
+
         if ($this->editingId) {
             Experience::findOrFail($this->editingId)->update($data);
             session()->flash('status', 'Experience updated.');
         } else {
+            $data['sort_order'] = Experience::nextSortOrder();
             Experience::create($data);
             session()->flash('status', 'Experience created.');
         }
+
         $this->resetForm();
-        $this->showForm = false;
     }
 
     public function delete(int $id): void
     {
-        Experience::findOrFail($id)->delete();
-        session()->flash('status', 'Experience deleted.');
+        Experience::findOrFail($id)->cancelRecord();
+
+        if ($this->editingId === $id) {
+            $this->resetForm();
+        }
+
+        session()->flash('status', 'Experience cancelled.');
+    }
+
+    public function restore(int $id): void
+    {
+        Experience::cancelledOnly()->findOrFail($id)->restoreRecord();
+        session()->flash('status', 'Experience restored.');
     }
 
     public function cancel(): void
     {
         $this->resetForm();
-        $this->showForm = false;
     }
 
     private function resetForm(): void
     {
-        $this->reset(['editingId', 'role', 'company', 'location', 'start_date', 'end_date', 'description']);
+        $this->reset(['editingId', 'creatingNew', 'role', 'company', 'location', 'start_date', 'end_date', 'description']);
         $this->is_current = false;
-        $this->sort_order = 0;
         $this->resetValidation();
     }
 
     public function render()
     {
         return view('livewire.admin.experience-manager', [
-            'experiences' => Experience::orderByDesc('sort_order')->get(),
+            'experiences' => $this->cancelledQuery(Experience::query())->orderBy('sort_order')->get(),
         ]);
     }
 }

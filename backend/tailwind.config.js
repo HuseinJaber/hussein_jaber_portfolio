@@ -15,6 +15,13 @@ export default {
         'bg-emerald-500',
         'bg-amber-500',
         'bg-rose-500',
+        'max-w-sm',
+        'max-w-md',
+        'max-w-lg',
+        'max-w-xl',
+        'max-w-2xl',
+        'max-w-3xl',
+        'bg-slate-900/60',
     ],
 
     theme: {

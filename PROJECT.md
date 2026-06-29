@@ -6,25 +6,26 @@
 
 ---
 
-## 1. The vision (what the owner asked for)
+## 1. The vision
 
 A premium, **professional Full Stack Developer portfolio** designed to win clients
-and get people to reach out for work. Requirements gathered from the owner:
+and get people to reach out for work. Core requirements:
 
-- A polished, animated, modern public website that "acts like a $100k project".
+- A polished, animated, modern public website with a high-end feel.
 - An **admin dashboard** to manage *everything* on the site (no code edits needed
-  to update content). Changes in the admin must instantly reflect on the website.
-- **Component-based** architecture everywhere (website **and** admin) so features
-  can be added/changed easily later.
-- Strong, secure foundation: **Laravel** backend + **MySQL**, a modern JS frontend
-  (**Next.js / React**), with **Livewire + Alpine.js + Tailwind CSS + SCSS**.
-- Tasteful animations (GSAP / Motion) for a high-end feel.
+  for day-to-day content). Changes in the admin appear on the website after refresh.
+- **Component-based** architecture everywhere (website **and** admin).
+- Strong, secure foundation: **Laravel** backend + **MySQL**, **Next.js / React**
+  frontend, **Livewire + Alpine.js + Tailwind** admin.
+- Tasteful animations (GSAP / Motion).
 - Easy to **deploy on Hostinger** later (see §9).
 - Two top-level folders in one repo: `backend/` and `frontend/`.
-- The owner will populate real content (projects, etc.) from the admin dashboard.
-  A CV was meant to be attached to seed real data — **it was not provided yet**, so
-  the project ships with **realistic placeholder content** that must be replaced
-  (see §8).
+
+**Current content status:** Profile, experience, education, certifications, services,
+skills, and testimonials are seeded from the owner's CV. Projects (~90) are imported
+from local development folders via `DocumentProjectScanner` / `DocumentProjectsSeeder`.
+The résumé PDF lives at `backend/public/files/hussein-jaber-cv.pdf` with
+`resume_url` set on the profile.
 
 ---
 
@@ -35,16 +36,14 @@ and get people to reach out for work. Requirements gathered from the owner:
 | Backend / API | **Laravel 13** (PHP 8.3) | Secure, batteries-included, perfect Hostinger support |
 | Database | **MySQL 8** | Requested; ubiquitous on Hostinger |
 | Admin dashboard | **Livewire 3 + Alpine.js + Tailwind** (Blade) | Server-rendered, secure, fast to build, fully component-based |
-| Auth | **Laravel Breeze** (Livewire stack) + **Sanctum** | Battle-tested session auth; Sanctum ready for future token APIs |
+| Auth | **Laravel Breeze** (Livewire stack) + **Sanctum** | Session auth for admin; Sanctum ready for future token APIs |
 | Public website | **Next.js 16 (App Router) + React 19 + TypeScript** | SEO-friendly SSR, great DX, modern animations |
 | Styling (frontend) | **Tailwind CSS v4 + SCSS** | Utility-first speed + SCSS for richer custom effects |
 | Animation | **Motion (Framer Motion) + GSAP** | Scroll reveals, layout animations, hero timeline |
 
-**Why two apps instead of one?** The owner explicitly wanted a separate React/Next
-frontend *and* a Livewire admin. So the public site is a decoupled Next.js app that
-consumes a JSON API, while the admin is a classic, secure server-rendered Laravel
-app. They share one MySQL database. This keeps the marketing site fast and SEO-ready
-while the admin stays simple and secure.
+**Why two apps?** The public site is a decoupled Next.js app consuming a JSON API.
+The admin is a classic server-rendered Laravel app. They share one MySQL database —
+marketing site stays fast and SEO-ready; admin stays simple and secure.
 
 ---
 
@@ -54,29 +53,43 @@ while the admin stays simple and secure.
 hussein_jaber_portfolio/
 ├── backend/                 # Laravel API + Livewire admin dashboard
 │   ├── app/
-│   │   ├── Http/Controllers/Api/   # PortfolioController, ContactController
-│   │   ├── Livewire/Admin/         # One component per resource (CRUD)
-│   │   └── Models/                 # Profile, Project, Skill, Service, ...
+│   │   ├── Http/Controllers/Api/   # Portfolio, Contact, Newsletter, Analytics, Certifications
+│   │   ├── Livewire/Admin/         # One component per admin resource
+│   │   ├── Livewire/Concerns/      # ManagesCancelledRecords, ReordersRecords
+│   │   ├── Mail/                   # Contact + newsletter mailables, ContactReplyMail
+│   │   ├── Models/                 # Profile, Project, ProjectCategory, TechStack, …
+│   │   ├── Services/               # PortfolioNotifier, DocumentProjectScanner
+│   │   └── Support/                # PortfolioSections, PortfolioMail
+│   ├── config/
+│   │   ├── portfolio.php           # owner email, registration flag
+│   │   ├── portfolio_sections.php  # homepage section definitions + default copy
+│   │   └── portfolio_engagement.php # project scanner engagement overrides
 │   ├── database/
-│   │   ├── migrations/             # All content tables
-│   │   └── seeders/DatabaseSeeder.php  # Admin user + placeholder content
+│   │   ├── migrations/
+│   │   └── seeders/
+│   │       ├── DatabaseSeeder.php      # profile, skills, experience, certs, …
+│   │       └── DocumentProjectsSeeder.php  # scans local project folders
 │   ├── resources/views/
-│   │   ├── components/admin/       # Reusable admin UI (input, card, button…)
-│   │   ├── components/layouts/admin.blade.php  # Sidebar admin shell
-│   │   └── livewire/admin/         # Admin component views
+│   │   ├── components/admin/       # input, card, button, modal, multi-select dropdown…
+│   │   ├── components/layouts/admin.blade.php
+│   │   ├── livewire/admin/
+│   │   └── mail/                   # HTML email templates
 │   └── routes/{web.php, api.php}
 │
 ├── frontend/                # Next.js public website
 │   └── src/
-│       ├── app/             # Routes: / (home), /projects/[slug]
+│       ├── app/             # /, /projects/[slug], /cv, /privacy, /terms, /cookies
 │       ├── components/
-│       │   ├── layout/      # Navbar, Footer
+│       │   ├── layout/      # Navbar, Footer, ScrollProgress, FooterNewsletter
 │       │   ├── sections/    # Hero, About, Services, Skills, Work, Experience,
-│       │   │                #   Testimonials, Contact
-│       │   └── ui/          # Reveal (motion), SectionHeading, Aurora, icons
-│       ├── lib/             # api.ts (fetchers), types.ts
-│       └── styles/          # aurora.scss (SCSS demo)
+│       │   │                #   Certifications, Testimonials, Contact
+│       │   ├── cv/          # CvDocument, CvPageActions
+│       │   ├── ui/          # Reveal, SectionHeading, Aurora, AnimatedCounter, icons
+│       │   ├── AnalyticsTracker.tsx, CookieConsent.tsx, …
+│       │   └── lib/         # api.ts, types.ts, sections.ts, cv.ts
+│       └── styles/          # aurora.scss
 │
+├── HusseinJaberCV.pdf       # source CV (copy also in backend/public/files/)
 ├── PROJECT.md               # ← you are here
 ├── AGENTS.md                # Operating notes for Cursor agents
 └── README.md
@@ -88,31 +101,46 @@ hussein_jaber_portfolio/
 
 | Table | Purpose |
 | --- | --- |
-| `users` | Admin login accounts |
-| `profiles` | Singleton: name, title, headline, bio, about, contact, stats, availability, SEO |
-| `social_links` | GitHub / LinkedIn / X / WhatsApp etc. |
-| `skills` | Name, category, level (0–100) |
+| `users` | Admin accounts (`is_admin` flag; public registration disabled by default) |
+| `profiles` | Singleton: identity, contact, stats, SEO, `sections` (visibility), `section_order`, `section_copy` |
+| `social_links` | GitHub, LinkedIn, Facebook, WhatsApp, etc. |
+| `skills` | Name, category, level (0–100), sort order |
 | `services` | What the owner offers to clients |
-| `projects` | Portfolio work: tech stack (JSON), images, links, featured/published flags |
-| `experiences` | Career timeline |
+| `project_categories` | Named categories (Web, E-Commerce, WordPress, …) with slug + sort order |
+| `tech_stacks` | Named technologies (Laravel, Livewire, MySQL, …) with slug + sort order |
+| `projects` | Title, slug, descriptions, URLs, engagement (`development`/`support`), work context (`none`/`company`/`freelance`), optional `experience_id`, `sites_count`, featured/published, sort order |
+| `project_project_category` | Many-to-many: projects ↔ categories |
+| `project_tech_stack` | Many-to-many: projects ↔ tech stacks |
+| `experiences` | Career timeline; `Experience::webAddicts()` helper for TheWebAddicts link |
 | `education` | Degrees / institutions |
+| `certifications` | Credentials; optional uploaded PDF (`credential_file`) served via API |
 | `testimonials` | Client quotes + rating |
-| `contact_messages` | Submissions from the public contact form |
+| `contact_messages` | Contact form submissions (`is_read` flag) |
+| `newsletter_subscribers` | Footer signup emails |
+| `analytics_events` | Lightweight page/section view tracking from the frontend |
 
-All content is managed from the admin dashboard and exposed (read-only) through the API.
+**Soft cancel:** Most content tables include a `cancelled` boolean. Admin **Cancel**
+hides records from the public site but keeps them in the database with a **Cancelled**
+tab for restore. Implemented via `HasCancelled` + `ManagesCancelledRecords`.
+
+**Normalization:** Category and tech-stack names are canonicalized on save
+(e.g. `E-commerce` → `E-Commerce`, `Laravel 13.8` → `Laravel`) to prevent duplicates.
 
 ---
 
 ## 5. Public API (consumed by the Next.js site)
 
-Base URL: `http://localhost:8000/api`
+Base URL: `http://localhost:8000/api` (or your Herd `.test` domain + `/api`)
 
 | Method | Endpoint | Description |
 | --- | --- | --- |
-| GET | `/portfolio` | Aggregate payload: profile, socials, skills, services, experiences, education, projects, testimonials |
-| GET | `/projects` | All published projects |
-| GET | `/projects/{slug}` | Single project |
-| POST | `/contact` | Store a contact message (validated, honeypot + rate-limited `6/min`) |
+| GET | `/portfolio` | Aggregate payload: profile (with sections/copy), socials, skills, services, experiences, education, certifications, projects, testimonials |
+| GET | `/projects` | All published, non-cancelled projects |
+| GET | `/projects/{slug}` | Single project with categories, tech stack, experience link |
+| GET | `/certifications/{id}/credential` | Download certification PDF (if uploaded) |
+| POST | `/contact` | Store contact message + send auto-reply emails (honeypot, `6/min`) |
+| POST | `/newsletter` | Subscribe + welcome email (`10/min`) |
+| POST | `/analytics` | Record page/section view (`120/min`) |
 
 The frontend fetches with `cache: "no-store"` so admin edits appear on refresh.
 
@@ -122,33 +150,60 @@ The frontend fetches with `cache: "no-store"` so admin edits appear on refresh.
 
 - URL: `http://localhost:8000/admin` (login at `/login`).
 - **Seeded admin:** `admin@huseinjaber.com` / `password` — **change this immediately.**
-- Every resource has its own Livewire component (`app/Livewire/Admin/*Manager.php`)
-  with list + create/edit/delete, validation, and flash feedback. Reusable Blade
-  UI lives in `resources/views/components/admin/`.
-- Sections: Dashboard (stats + latest messages), Profile, Projects, Skills,
-  Services, Experience, Education, Testimonials, Social Links, Messages.
+- Reusable Blade UI in `resources/views/components/admin/`.
+- Livewire components in `app/Livewire/Admin/*`.
+
+| Section | Route | Notes |
+| --- | --- | --- |
+| Dashboard | `/admin` | Stats + latest messages |
+| Profile | `/admin/profile-content` | Identity, contact, stats, SEO, resume URL |
+| Sections | `/admin/sections` | Toggle homepage blocks; edit nav labels + section headings (accordion UI) |
+| Projects | `/admin/projects` | List with drag reorder; add/edit on separate pages |
+| ↳ Add / Edit | `/admin/projects/create`, `/admin/projects/{id}/edit` | Compact category + tech-stack dropdowns |
+| Project categories | `/admin/project-categories` | Manage category names |
+| Tech stacks | `/admin/tech-stacks` | Manage stack names |
+| Skills | `/admin/skills` | Drag reorder |
+| Services | `/admin/services` | |
+| Experience | `/admin/experience` | Projects can link to a company experience |
+| Education | `/admin/education` | |
+| Certifications | `/admin/certifications` | Optional PDF upload |
+| Testimonials | `/admin/testimonials` | |
+| Social Links | `/admin/socials` | |
+| Messages | `/admin/messages` | Read/unread; **Reply** sends email from admin |
+| Newsletter | `/admin/newsletter` | Subscriber list |
+| Analytics | `/admin/analytics` | View tracked events |
+
+**Projects:** Each project has an **engagement type** (Development vs Support), optional
+**work context** (linked to an experience / freelance), **multiple categories**, and
+**multiple tech stacks**. Default new projects link to TheWebAddicts Full Stack Developer
+experience when that record exists.
+
+**Messages:** Reply opens an in-admin compose modal; sends `ContactReplyMail` to the
+visitor with Reply-To set to the owner inbox (`MAIL_OWNER_ADDRESS` or profile email).
 
 ---
 
 ## 7. Running locally (fresh machine)
 
 **Prerequisites:** PHP 8.3 + extensions, Composer, Node 20+, MySQL 8.
+(Laravel Herd on macOS is optional but supported — see `backend/.env.example`.)
 
 ```bash
-# 1. Database (create db + user, or use your own and edit backend/.env)
+# 1. Database
 mysql -u root -e "CREATE DATABASE portfolio CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 mysql -u root -e "CREATE USER 'portfolio'@'localhost' IDENTIFIED BY 'portfolio_secret'; GRANT ALL ON portfolio.* TO 'portfolio'@'localhost'; FLUSH PRIVILEGES;"
 
 # 2. Backend
 cd backend
-cp .env.example .env          # adjust DB_* if needed
+cp .env.example .env          # adjust DB_*, APP_URL, FRONTEND_URL, MAIL_* as needed
 composer install
 npm install
 php artisan key:generate
-php artisan migrate --seed     # creates tables + placeholder content + admin user
-npm run dev                    # compiles admin assets (Vite) — keep running
-# in another terminal:
-php artisan serve              # http://localhost:8000
+php artisan migrate --seed     # tables + CV content + admin user
+# Optional on owner's Mac — import projects from /Library/WebServer/Documents:
+# php artisan db:seed --class=DocumentProjectsSeeder
+npm run dev                    # Vite — keep running for admin styles
+php artisan serve              # http://localhost:8000 (or use Herd)
 
 # 3. Frontend
 cd ../frontend
@@ -161,61 +216,130 @@ Open the site at **http://localhost:3000** and the admin at **http://localhost:8
 
 ---
 
-## 8. IMPORTANT — replace placeholder content
+## 8. Content management
 
-The CV was not provided, so all personal data is **placeholder**. Update it via the
-admin dashboard (preferred) or in `backend/database/seeders/DatabaseSeeder.php`:
+**Preferred:** edit everything through the admin dashboard.
 
-- Real bio, headline, contact details, location, social URLs, stats.
-- Real projects (with images), skills levels, services, experience, education,
-  testimonials.
-- A real résumé PDF (drop it in `backend/public/files/` and set `resume_url`).
-- SEO `meta_title` / `meta_description` on the Profile.
-- **Change the admin password** and the seeded admin email.
+**Seeders:**
+- `DatabaseSeeder` — admin user, profile (real CV data), skills, services, experience,
+  education, certifications, testimonials, social links, sample contact message.
+- `DocumentProjectsSeeder` — scans `DocumentProjectScanner::DOCUMENTS_ROOT`
+  (`/Library/WebServer/Documents` on the owner's Mac) and upserts projects with
+  auto-detected categories, tech stacks, and engagement types. Override folder lists
+  in `config/portfolio_engagement.php`.
 
-> When the CV is available, hand it to the Cursor agent and ask it to update the
-> seeder + profile content to match.
+**Résumé:** PDF at `backend/public/files/hussein-jaber-cv.pdf`; `resume_url` on profile
+is `/files/hussein-jaber-cv.pdf`.
+
+**Homepage sections:** Defaults and copy live in `config/portfolio_sections.php`.
+Runtime values are stored on `profiles.sections`, `section_order`, and `section_copy`
+and edited in Admin → Sections. Hero content always comes from Profile fields.
+
+**Email (production):** Set real SMTP (or Mailgun/Resend) in `.env`. Key vars:
+`MAIL_MAILER`, `MAIL_FROM_ADDRESS`, `MAIL_OWNER_ADDRESS`. Local dev uses `log` driver.
 
 ---
 
-## 9. Deploying to Hostinger (roadmap)
+## 9. Deploying to production
 
-**Backend (Laravel) — Hostinger shared hosting or VPS:**
-1. Create a MySQL database + user in hPanel; put credentials in `.env`.
-2. Upload `backend/` (or git deploy). Point the domain's document root to
-   `backend/public`.
-3. `composer install --no-dev --optimize-autoloader`, `php artisan key:generate`,
-   `php artisan migrate --force`, `php artisan config:cache route:cache view:cache`.
-4. `npm install && npm run build` for the admin assets.
-5. Set `APP_ENV=production`, `APP_DEBUG=false`, correct `APP_URL` + `FRONTEND_URL`.
+### First-time server setup
+
+**Backend (Laravel) — shared hosting or VPS:**
+
+1. Clone the repo and `cd backend`.
+2. Copy env: `cp .env.example .env` then edit:
+   - `APP_ENV=production`, `APP_DEBUG=false`
+   - `APP_URL` — public backend URL (e.g. `https://api.yourdomain.com`)
+   - `FRONTEND_URL` — public Next.js URL (e.g. `https://yourdomain.com`) — **required for CORS**
+   - `DB_*` — production MySQL credentials
+   - `MAIL_*` and `MAIL_OWNER_ADDRESS` — real SMTP transport
+3. Install and optimize:
+   ```bash
+   composer install --no-dev --optimize-autoloader
+   php artisan key:generate    # first deploy only
+   php artisan migrate --force
+   npm ci && npm run build     # admin Vite assets → public/build/
+   php artisan storage:link    # if serving uploaded certification PDFs
+   php artisan config:cache route:cache view:cache
+   ```
+4. Point the web server document root to `backend/public`.
+5. Ensure `storage/` and `bootstrap/cache/` are writable.
 
 **Frontend (Next.js):**
-- **Option A (recommended): Hostinger VPS / Node hosting** — run `npm run build`
-  then `npm run start` behind a reverse proxy (or `pm2`).
-- **Option B: static-friendly host (Vercel/Netlify)** — easiest for Next.js; point
-  `NEXT_PUBLIC_API_URL` at the deployed Laravel API and enable CORS for that origin.
 
-**Security checklist before launch:** strong admin password, `APP_DEBUG=false`,
-HTTPS, lock CORS (`backend` `config/cors.php`) to the real frontend origin, keep
-the contact-form rate limit, and consider adding captcha if spam appears.
+1. `cd frontend`, copy `cp .env.example .env.local` and set:
+   - `NEXT_PUBLIC_API_URL` — production API (e.g. `https://api.yourdomain.com/api`)
+   - `NEXT_PUBLIC_SITE_URL` — public site URL
+2. Build and run:
+   ```bash
+   npm ci
+   npm run build
+   npm run start    # or pm2 / systemd behind nginx
+   ```
+3. **Option B:** Deploy to Vercel/Netlify — set the same env vars in the dashboard.
+
+### Pulling updates (routine deploy)
+
+```bash
+git pull origin main
+
+# Backend
+cd backend
+composer install --no-dev --optimize-autoloader
+php artisan migrate --force
+npm ci && npm run build
+php artisan config:cache route:cache view:cache
+
+# Frontend
+cd ../frontend
+npm ci
+npm run build
+# restart Node process (pm2 restart portfolio, etc.)
+```
+
+### Hostinger notes
+
+- **Shared hosting:** Laravel in `backend/` with docroot → `public/`; Next.js needs
+  a Node-capable plan or a separate VPS.
+- **VPS:** nginx reverse proxy — frontend on `:3000`, backend on PHP-FPM or `artisan serve` behind proxy.
+- Re-run `php artisan migrate --force` after every pull that includes new migrations.
+
+### Security checklist
+
+- Change seeded admin password immediately.
+- `APP_DEBUG=false`, HTTPS everywhere.
+- `FRONTEND_URL` matches the real frontend origin (CORS is locked to `FRONTEND_URL` + `APP_URL`).
+- `PORTFOLIO_REGISTRATION_ENABLED=false` unless you need public sign-up.
+- Configure real mail transport; verify contact form + newsletter delivery.
+- Optional: run queue worker for mail (`php artisan queue:work`) if using `QUEUE_CONNECTION=database`.
+
+### CI
+
+GitHub Actions (`.github/workflows/ci.yml`) runs backend tests + asset build and
+frontend lint + build on every push/PR to `main`.
 
 ---
 
 ## 10. Suggested next steps (backlog)
 
-- Image **uploads** in the admin (currently image URLs) via Laravel filesystem.
-- Email notification when a new contact message arrives (Laravel Mail/queue).
+- Image **uploads** in the admin (cover images are still URL fields).
 - Rich-text editor for project descriptions.
-- Drag-and-drop ordering for projects/skills.
-- Blog/articles section.
-- Multi-language (the owner is in Lebanon — EN/AR could help).
-- Automated tests for the frontend (Playwright) + more backend coverage.
+- Blog / articles section.
+- Multi-language (EN/AR).
+- Frontend E2E tests (Playwright).
+- Queue workers for mail in production (`QUEUE_CONNECTION=database` is already configured).
 
 ---
 
 ## 11. Testing & quality
 
-- Backend: `cd backend && php artisan test` (feature tests cover the API, contact
-  validation, auth protection, and that every admin page renders). Formatting:
-  `./vendor/bin/pint`.
-- Frontend: `cd frontend && npm run lint` and `npm run build`.
+**Backend** (`cd backend && php artisan test`):
+- `PortfolioTest` — public API, contact/newsletter validation, admin page smoke tests.
+- `SectionSettingsTest` — section visibility + copy via API.
+- `MessageReplyTest` — admin contact reply email.
+- `SecurityTest` — auth / admin middleware.
+- Breeze auth tests under `tests/Feature/Auth/`.
+
+Formatting: `./vendor/bin/pint`.
+
+**Frontend:** `cd frontend && npm run lint && npm run build`.

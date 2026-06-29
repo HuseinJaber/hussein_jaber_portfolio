@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Frontend — Next.js Public Site
 
-## Getting Started
+Next.js 16 (App Router) + React 19 + TypeScript portfolio website. Server-renders
+pages and fetches content from the Laravel API.
 
-First, run the development server:
+## Routes
+
+| Path | Description |
+| --- | --- |
+| `/` | Home — configurable sections (hero, work, skills, …) |
+| `/projects/[slug]` | Project detail page |
+| `/cv` | Live résumé built from API data + PDF download |
+| `/privacy`, `/terms`, `/cookies` | Legal pages |
+
+## Quick start
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env.local
+npm install
+npm run dev    # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The backend **must be running** — the home page fetches `/api/portfolio` at request time.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Variable | Purpose |
+| --- | --- |
+| `NEXT_PUBLIC_API_URL` | Laravel API base (e.g. `http://localhost:8000/api`) |
+| `NEXT_PUBLIC_SITE_URL` | This site's public URL (metadata, canonical links) |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+On macOS with **Laravel Herd**, `package.json` scripts set `NODE_EXTRA_CA_CERTS` so
+Node trusts the local Valet CA when calling an HTTPS `.test` API during dev/build.
 
-## Learn More
+## Commands
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run dev      # Development server
+npm run lint     # ESLint
+npm run build    # Production build
+npm run start    # Serve production build
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Styling
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Tailwind CSS v4 utilities are generated from the `@theme` block in `src/app/globals.css`
+(e.g. `text-muted`, `bg-brand`). Custom effects live in SCSS (`src/styles/`).
 
-## Deploy on Vercel
+Animation: **Motion** (Framer Motion) + **GSAP** for hero and scroll reveals.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Privacy / analytics
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Cookie consent (`CookieConsent.tsx`) gates lightweight first-party analytics
+(page views, section engagement). No third-party trackers.
+
+Full architecture: **[PROJECT.md](../PROJECT.md)**.

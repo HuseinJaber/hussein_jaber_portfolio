@@ -2,29 +2,24 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasCancelled;
+use App\Models\Concerns\SortableRecords;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 
 class Service extends Model
 {
+    use HasCancelled, SortableRecords;
+
     protected $guarded = [];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'cancelled' => 'boolean',
         'sort_order' => 'integer',
     ];
 
-    protected static function booted(): void
-    {
-        static::saving(function (Service $service) {
-            if (blank($service->slug)) {
-                $service->slug = Str::slug($service->title).'-'.Str::random(4);
-            }
-        });
-    }
-
     public function scopeActive($query)
     {
-        return $query->where('is_active', true);
+        return $query->where('is_active', true)->notCancelled();
     }
 }

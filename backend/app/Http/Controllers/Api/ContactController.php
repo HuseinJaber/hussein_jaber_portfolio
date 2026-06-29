@@ -3,21 +3,15 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ContactMessageRequest;
 use App\Models\ContactMessage;
-use Illuminate\Http\Request;
+use App\Services\PortfolioNotifier;
 
 class ContactController extends Controller
 {
-    public function store(Request $request)
+    public function store(ContactMessageRequest $request)
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:120'],
-            'email' => ['required', 'email', 'max:180'],
-            'subject' => ['nullable', 'string', 'max:180'],
-            'message' => ['required', 'string', 'max:5000'],
-            // Honeypot field — must stay empty for real humans.
-            'website' => ['nullable', 'size:0'],
-        ]);
+        $validated = $request->validated();
 
         $message = ContactMessage::create([
             'name' => $validated['name'],
@@ -27,8 +21,10 @@ class ContactController extends Controller
             'ip_address' => $request->ip(),
         ]);
 
+        PortfolioNotifier::contactSubmitted($message);
+
         return response()->json([
-            'message' => "Thanks for reaching out! I'll get back to you shortly.",
+            'message' => "Thanks for reaching out! I've sent a confirmation to your inbox and will get back to you shortly.",
             'id' => $message->id,
         ], 201);
     }

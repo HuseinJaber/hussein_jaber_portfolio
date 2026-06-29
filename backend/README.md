@@ -1,58 +1,58 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Backend — Laravel API + Admin
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Laravel 13 application that powers the portfolio **JSON API** and **Livewire admin
+dashboard**. Shares one MySQL database with the Next.js frontend.
 
-## About Laravel
+## Responsibilities
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Public API** (`/api/*`) — portfolio payload, contact, newsletter, analytics, certification downloads.
+- **Admin** (`/admin`) — content management for profile, sections, projects, skills, messages, etc.
+- **Auth** — Laravel Breeze (session); admin-only access via `is_admin` middleware.
+- **Mail** — contact auto-replies, newsletter welcome, owner notifications, admin message replies.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Quick start
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+Full setup lives in the root **[PROJECT.md](../PROJECT.md)**. Minimum commands:
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+cp .env.example .env
+composer install && npm install
+php artisan key:generate
+php artisan migrate --seed
+npm run dev          # Vite — keep running for admin styles
+php artisan serve    # http://localhost:8000 (or use Laravel Herd)
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Admin: `/admin` — seeded login `admin@huseinjaber.com` / `password` (**change in production**).
 
-## Contributing
+## Environment
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Key variables in `.env.example`:
 
-## Code of Conduct
+| Variable | Purpose |
+| --- | --- |
+| `APP_URL` | Backend public URL (Herd `.test` or `http://localhost:8000`) |
+| `FRONTEND_URL` | Next.js origin — used for CORS |
+| `MAIL_*` / `MAIL_OWNER_ADDRESS` | SMTP + inbox for contact/newsletter alerts |
+| `PORTFOLIO_REGISTRATION_ENABLED` | Public sign-up (default `false`) |
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Commands
 
-## Security Vulnerabilities
+```bash
+php artisan test              # PHPUnit (SQLite in-memory)
+./vendor/bin/pint             # PHP formatting
+npm run build                 # Production admin assets → public/build/
+php artisan migrate --force   # Production migrations
+php artisan config:cache route:cache view:cache
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Project import (owner's Mac only)
 
-## License
+`DocumentProjectsSeeder` scans local dev folders under `/Library/WebServer/Documents`.
+On other machines it no-ops. Re-import locally:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+php artisan db:seed --class=DocumentProjectsSeeder
+```
+
+See **[PROJECT.md](../PROJECT.md)** §8 for content management details.

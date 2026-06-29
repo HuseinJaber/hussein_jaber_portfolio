@@ -1,15 +1,20 @@
-import type { Experience as Exp } from "@/lib/types";
+import type { Experience as Exp, SectionCopy } from "@/lib/types";
 import Reveal from "@/components/ui/Reveal";
 import SectionHeading from "@/components/ui/SectionHeading";
 
-export default function Experience({ experiences }: { experiences: Exp[] }) {
+export default function Experience({ experiences, copy }: { experiences: Exp[]; copy: SectionCopy }) {
   if (experiences.length === 0) return null;
 
   return (
-    <section id="experience" className="mx-auto max-w-4xl px-4 py-24">
-      <SectionHeading eyebrow="Career" title="Where I've worked" />
+    <section id="experience" className="mx-auto max-w-4xl px-4 py-16">
+      <SectionHeading
+        eyebrow={copy.eyebrow}
+        title={copy.title}
+        subtitle={copy.subtitle ?? undefined}
+        align={copy.align}
+      />
 
-      <div className="relative mt-14 border-l border-line pl-8">
+      <div className="relative mt-10 border-l border-line pl-8">
         {experiences.map((exp, i) => (
           <Reveal key={exp.id} delay={i} className="relative pb-10 last:pb-0">
             <span className="absolute -left-[41px] top-1 flex h-4 w-4 items-center justify-center rounded-full border-2 border-brand bg-bg">

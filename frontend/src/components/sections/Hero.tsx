@@ -3,7 +3,9 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import type { Profile, SocialLink } from "@/lib/types";
-import { SocialIcon } from "@/components/ui/icons";
+import { AnimatedCounter } from "@/components/ui/AnimatedCounter";
+import { SocialIcon, EmailIcon, LocationIcon, ContactIconBox } from "@/components/ui/icons";
+import { isSectionEnabled } from "@/lib/sections";
 
 export default function Hero({
   profile,
@@ -21,17 +23,24 @@ export default function Hero({
         .from(".hero-line", { y: 40, opacity: 0, duration: 0.8, stagger: 0.12 }, "-=0.2")
         .from(".hero-sub", { y: 20, opacity: 0, duration: 0.6 }, "-=0.4")
         .from(".hero-cta", { y: 20, opacity: 0, duration: 0.6, stagger: 0.1 }, "-=0.3")
-        .from(".hero-stat", { y: 20, opacity: 0, duration: 0.5, stagger: 0.1 }, "-=0.2")
         .from(".hero-social", { scale: 0, opacity: 0, duration: 0.4, stagger: 0.06 }, "-=0.4");
     }, root);
     return () => ctx.revert();
   }, []);
 
   const stats = [
-    { value: `${profile.years_experience}+`, label: "Years experience" },
-    { value: `${profile.projects_completed}+`, label: "Projects shipped" },
-    { value: `${profile.happy_clients}+`, label: "Happy clients" },
+    { value: profile.years_experience, label: "Years of experience" },
+    { value: profile.projects_completed, label: "Projects delivered" },
+    { value: profile.happy_clients, label: "Clients served" },
   ];
+
+  const showContact = isSectionEnabled(profile.sections, "contact");
+  const showWork = isSectionEnabled(profile.sections, "work");
+  const primaryCtaHref = showContact
+    ? "#contact"
+    : profile.email
+      ? `mailto:${profile.email}`
+      : null;
 
   return (
     <section id="home" ref={root} className="relative flex min-h-screen items-center pt-28">
@@ -43,7 +52,7 @@ export default function Hero({
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
               </span>
-              Available for new projects
+              Open to new projects
             </span>
           )}
 
@@ -57,17 +66,27 @@ export default function Hero({
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-4">
+            {primaryCtaHref && (
+              <a
+                href={primaryCtaHref}
+                className="hero-cta rounded-xl bg-gradient-to-r from-brand to-brand-2 px-6 py-3 font-semibold text-white shadow-lg shadow-indigo-600/30 transition hover:-translate-y-0.5"
+              >
+                {showContact ? "Start a project" : "Email me"}
+              </a>
+            )}
+            {showWork && (
+              <a
+                href="#work"
+                className="hero-cta rounded-xl border border-line bg-white/5 px-6 py-3 font-semibold transition hover:border-brand"
+              >
+                View portfolio
+              </a>
+            )}
             <a
-              href="#contact"
-              className="hero-cta rounded-xl bg-gradient-to-r from-brand to-brand-2 px-6 py-3 font-semibold text-white shadow-lg shadow-indigo-600/30 transition hover:-translate-y-0.5"
-            >
-              Let&apos;s work together
-            </a>
-            <a
-              href="#work"
+              href="/cv"
               className="hero-cta rounded-xl border border-line bg-white/5 px-6 py-3 font-semibold transition hover:border-brand"
             >
-              View my work
+              View résumé
             </a>
           </div>
 
@@ -79,7 +98,11 @@ export default function Hero({
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={s.label ?? s.platform}
-                className="hero-social flex h-11 w-11 items-center justify-center rounded-xl border border-line bg-white/5 text-muted transition hover:-translate-y-0.5 hover:border-brand hover:text-white"
+                className={`hero-social flex h-11 w-11 items-center justify-center rounded-xl border border-line bg-white/5 text-muted transition hover:-translate-y-0.5 hover:text-white ${
+                  (s.icon ?? s.platform).toLowerCase() === "whatsapp"
+                    ? "hover:border-emerald-400/50 hover:bg-emerald-400/10 hover:text-emerald-300"
+                    : "hover:border-brand"
+                }`}
               >
                 <SocialIcon name={s.icon ?? s.platform} className="h-5 w-5" />
               </a>
@@ -90,23 +113,34 @@ export default function Hero({
         <div className="relative">
           <div className="glass glow rounded-3xl p-8">
             <div className="grid grid-cols-3 gap-6">
-              {stats.map((s) => (
-                <div key={s.label} className="hero-stat text-center">
-                  <p className="text-3xl font-bold text-gradient sm:text-4xl">{s.value}</p>
+              {stats.map((s, index) => (
+                <div key={s.label} className="text-center">
+                  <p className="text-3xl font-bold text-gradient sm:text-4xl">
+                    <AnimatedCounter value={s.value} delay={index * 0.15} />
+                  </p>
                   <p className="mt-1 text-xs text-muted">{s.label}</p>
                 </div>
               ))}
             </div>
-            <div className="mt-8 space-y-3 text-sm">
+            <div className="mt-8 space-y-2 text-sm">
               {profile.location && (
-                <p className="flex items-center gap-2 text-muted">
-                  <span className="text-accent">◉</span> Based in {profile.location}
+                <p className="flex items-center gap-3 text-muted">
+                  <ContactIconBox>
+                    <LocationIcon className="h-4 w-4" />
+                  </ContactIconBox>
+                  <span>Based in {profile.location}</span>
                 </p>
               )}
               {profile.email && (
-                <p className="flex items-center gap-2 text-muted">
-                  <span className="text-accent">✉</span> {profile.email}
-                </p>
+                <a
+                  href={`mailto:${profile.email}`}
+                  className="group flex items-center gap-3 rounded-xl text-muted transition hover:text-white"
+                >
+                  <ContactIconBox>
+                    <EmailIcon className="h-4 w-4" />
+                  </ContactIconBox>
+                  <span className="truncate">{profile.email}</span>
+                </a>
               )}
             </div>
           </div>

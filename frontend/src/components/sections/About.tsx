@@ -1,18 +1,25 @@
-import type { Education, Profile } from "@/lib/types";
+import type { Education, Profile, SectionCopy } from "@/lib/types";
 import Reveal from "@/components/ui/Reveal";
 import SectionHeading from "@/components/ui/SectionHeading";
 
 export default function About({
   profile,
   education,
+  copy,
 }: {
   profile: Profile;
   education: Education[];
+  copy: SectionCopy;
 }) {
   return (
-    <section id="about" className="mx-auto max-w-6xl px-4 py-24">
-      <SectionHeading eyebrow="About" title="A bit about me" align="left" />
-      <div className="mt-10 grid gap-10 lg:grid-cols-[1.4fr_1fr]">
+    <section id="about" className="mx-auto max-w-6xl px-4 py-16">
+      <SectionHeading
+        eyebrow={copy.eyebrow}
+        title={copy.title}
+        subtitle={copy.subtitle ?? undefined}
+        align={copy.align}
+      />
+      <div className="mt-8 grid gap-8 lg:grid-cols-[1.4fr_1fr]">
         <Reveal>
           <div className="space-y-5 text-lg leading-relaxed text-muted">
             {(profile.about ?? profile.bio ?? "").split("\n").filter(Boolean).map((p, i) => (

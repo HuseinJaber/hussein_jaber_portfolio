@@ -1,19 +1,26 @@
-import type { Testimonial } from "@/lib/types";
+import type { SectionCopy, Testimonial } from "@/lib/types";
 import Reveal from "@/components/ui/Reveal";
 import SectionHeading from "@/components/ui/SectionHeading";
 
-export default function Testimonials({ testimonials }: { testimonials: Testimonial[] }) {
+export default function Testimonials({
+  testimonials,
+  copy,
+}: {
+  testimonials: Testimonial[];
+  copy: SectionCopy;
+}) {
   if (testimonials.length === 0) return null;
 
   return (
-    <section id="testimonials" className="mx-auto max-w-6xl px-4 py-24">
+    <section id="testimonials" className="mx-auto max-w-6xl px-4 py-16">
       <SectionHeading
-        eyebrow="Testimonials"
-        title="What clients say"
-        subtitle="I care deeply about delivering work that makes my clients look great."
+        eyebrow={copy.eyebrow}
+        title={copy.title}
+        subtitle={copy.subtitle ?? undefined}
+        align={copy.align}
       />
 
-      <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {testimonials.map((t, i) => (
           <Reveal key={t.id} delay={i}>
             <figure className="flex h-full flex-col rounded-2xl border border-line bg-white/[0.02] p-6">

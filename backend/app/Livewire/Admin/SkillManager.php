@@ -2,6 +2,8 @@
 
 namespace App\Livewire\Admin;
 
+use App\Livewire\Concerns\ManagesCancelledRecords;
+use App\Livewire\Concerns\ReordersRecords;
 use App\Models\Skill;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -11,9 +13,11 @@ use Livewire\Component;
 #[Title('Skills')]
 class SkillManager extends Component
 {
-    public bool $showForm = false;
+    use ManagesCancelledRecords, ReordersRecords;
 
     public ?int $editingId = null;
+
+    public bool $creatingNew = false;
 
     public string $name = '';
 
@@ -23,9 +27,12 @@ class SkillManager extends Component
 
     public string $icon = '';
 
-    public int $sort_order = 0;
-
     public bool $is_active = true;
+
+    protected function sortableModelClass(): string
+    {
+        return Skill::class;
+    }
 
     protected function rules(): array
     {
@@ -34,7 +41,6 @@ class SkillManager extends Component
             'category' => 'required|string|max:60',
             'level' => 'required|integer|min:0|max:100',
             'icon' => 'nullable|string|max:60',
-            'sort_order' => 'integer',
             'is_active' => 'boolean',
         ];
     }
@@ -42,50 +48,60 @@ class SkillManager extends Component
     public function create(): void
     {
         $this->resetForm();
-        $this->showForm = true;
+        $this->creatingNew = true;
     }
 
     public function edit(int $id): void
     {
         $s = Skill::findOrFail($id);
+        $this->creatingNew = false;
         $this->editingId = $s->id;
-        $this->fill($s->only(['name', 'category', 'level', 'icon', 'sort_order', 'is_active']));
+        $this->fill($s->only(['name', 'category', 'level', 'is_active']));
         $this->icon = (string) $s->icon;
-        $this->showForm = true;
+        $this->resetValidation();
     }
 
     public function save(): void
     {
         $data = $this->validate();
+
         if ($this->editingId) {
             Skill::findOrFail($this->editingId)->update($data);
             session()->flash('status', 'Skill updated.');
         } else {
+            $data['sort_order'] = Skill::nextSortOrder();
             Skill::create($data);
             session()->flash('status', 'Skill created.');
         }
+
         $this->resetForm();
-        $this->showForm = false;
     }
 
     public function delete(int $id): void
     {
-        Skill::findOrFail($id)->delete();
-        session()->flash('status', 'Skill deleted.');
+        Skill::findOrFail($id)->cancelRecord();
+        if ($this->editingId === $id) {
+            $this->resetForm();
+        }
+        session()->flash('status', 'Skill cancelled.');
+    }
+
+    public function restore(int $id): void
+    {
+        Skill::cancelledOnly()->findOrFail($id)->restoreRecord();
+        session()->flash('status', 'Skill restored.');
     }
 
     public function cancel(): void
     {
         $this->resetForm();
-        $this->showForm = false;
     }
 
     private function resetForm(): void
     {
-        $this->reset(['editingId', 'name', 'icon']);
+        $this->reset(['editingId', 'creatingNew', 'name', 'icon']);
         $this->category = 'Backend';
         $this->level = 80;
-        $this->sort_order = 0;
         $this->is_active = true;
         $this->resetValidation();
     }
@@ -93,7 +109,7 @@ class SkillManager extends Component
     public function render()
     {
         return view('livewire.admin.skill-manager', [
-            'skills' => Skill::orderBy('category')->orderBy('sort_order')->get(),
+            'skills' => $this->cancelledQuery(Skill::query())->orderBy('sort_order')->get(),
         ]);
     }
 }

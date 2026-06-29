@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getProject } from "@/lib/api";
+import { getPortfolio, getProject } from "@/lib/api";
 import Aurora from "@/components/ui/Aurora";
+import { ProjectContributionBadges } from "@/components/ui/ProjectContributionBadges";
+import { isSectionEnabled, resolveSections } from "@/lib/sections";
 
 export default async function ProjectPage({
   params,
@@ -9,22 +11,41 @@ export default async function ProjectPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const project = await getProject(slug);
+  const [project, portfolio] = await Promise.all([getProject(slug), getPortfolio()]);
 
   if (!project) notFound();
+
+  const sections = resolveSections(portfolio?.profile.sections);
+  const workEnabled = isSectionEnabled(sections, "work");
 
   return (
     <>
       <Aurora />
       <main className="mx-auto max-w-4xl px-4 py-24">
-        <Link href="/#work" className="text-sm text-muted transition hover:text-white">
-          ← Back to work
+        <Link
+          href={workEnabled ? "/#work" : "/"}
+          className="text-sm text-muted transition hover:text-white"
+        >
+          ← {workEnabled ? "Back to work" : "Back to home"}
         </Link>
 
         <p className="mt-8 text-xs uppercase tracking-widest text-accent">
           {project.category}
           {project.year ? ` · ${project.year}` : ""}
+          {project.sites_count ? ` · ${project.sites_count}+ sites` : ""}
         </p>
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <span
+            className={`rounded-full px-3 py-1 text-xs font-semibold ${
+              project.engagement_type === "support"
+                ? "bg-sky-400/20 text-sky-200"
+                : "bg-violet-400/20 text-violet-200"
+            }`}
+          >
+            {project.engagement_type === "support" ? "Support" : "Development"}
+          </span>
+          <ProjectContributionBadges project={project} />
+        </div>
         <h1 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">{project.title}</h1>
         {project.short_description && (
           <p className="mt-4 text-lg text-muted">{project.short_description}</p>
