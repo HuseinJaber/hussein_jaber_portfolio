@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { SectionKey } from "@/lib/types";
-
-const SCROLL_OFFSET = 120;
+import { SCROLL_OFFSET } from "@/lib/scroll";
 
 export function useHomeScroll(sectionIds: SectionKey[]) {
   const [progress, setProgress] = useState(0);

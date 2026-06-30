@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import type { SectionCopyMap, SectionKey, SectionSettings } from "@/lib/types";
 import { isSectionEnabled, visibleNavSections } from "@/lib/sections";
+import { scrollToSection } from "@/lib/scroll";
 import { useHomeScroll } from "@/hooks/useHomeScroll";
 import ScrollProgress from "@/components/layout/ScrollProgress";
 
@@ -38,6 +39,20 @@ export default function Navbar({
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
+  const handleSectionClick = (event: MouseEvent<HTMLAnchorElement>, sectionId: string) => {
+    event.preventDefault();
+    setOpen(false);
+    document.body.style.overflow = "";
+    scrollToSection(sectionId);
+  };
+
   const initials = name
     .split(" ")
     .map((w) => w[0])
@@ -68,12 +83,13 @@ export default function Navbar({
       >
         <div className="mx-auto max-w-6xl px-4">
           <nav
-            className={`flex items-center justify-between rounded-2xl px-4 py-3 transition-all ${
+            className={`relative z-50 flex items-center justify-between rounded-2xl px-4 py-3 transition-all ${
               scrolled ? "glass glow" : ""
             }`}
           >
             <a
               href="#home"
+              onClick={(event) => handleSectionClick(event, "home")}
               className={`flex items-center gap-2 font-bold transition ${
                 activeSection === "home" ? "text-white" : ""
               }`}
@@ -87,7 +103,11 @@ export default function Navbar({
             <ul className="hidden items-center gap-1 md:flex">
               {links.map((l) => (
                 <li key={l.href}>
-                  <a href={l.href} className={linkClass(l.key)}>
+                  <a
+                    href={l.href}
+                    onClick={(event) => handleSectionClick(event, l.key)}
+                    className={linkClass(l.key)}
+                  >
                     {l.label}
                     {activeSection === l.key && (
                       <span className="absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full bg-gradient-to-r from-brand to-brand-2" />
@@ -101,6 +121,11 @@ export default function Navbar({
               {hireHref && (
                 <a
                   href={hireHref}
+                  onClick={
+                    showContactCta
+                      ? (event) => handleSectionClick(event, "contact")
+                      : undefined
+                  }
                   className="hidden rounded-xl bg-white px-4 py-2 text-sm font-semibold text-black transition hover:bg-accent sm:inline-block"
                 >
                   Hire me
@@ -120,28 +145,39 @@ export default function Navbar({
 
           <AnimatePresence>
             {open && (
-              <motion.ul
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                className="glass mt-2 overflow-hidden rounded-2xl p-2 md:hidden"
-              >
-                {links.map((l) => (
-                  <li key={l.href}>
-                    <a
-                      href={l.href}
-                      onClick={() => setOpen(false)}
-                      className={`block rounded-lg px-4 py-3 text-sm transition ${
-                        activeSection === l.key
-                          ? "bg-white/10 font-medium text-white"
-                          : "text-muted hover:bg-white/5 hover:text-white"
-                      }`}
-                    >
-                      {l.label}
-                    </a>
-                  </li>
-                ))}
-              </motion.ul>
+              <>
+                <motion.button
+                  type="button"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  aria-label="Close menu"
+                  className="fixed inset-0 z-40 bg-bg/70 backdrop-blur-sm md:hidden"
+                  onClick={() => setOpen(false)}
+                />
+                <motion.ul
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  className="glass relative z-50 mt-2 rounded-2xl p-2 md:hidden"
+                >
+                  {links.map((l) => (
+                    <li key={l.href}>
+                      <a
+                        href={l.href}
+                        onClick={(event) => handleSectionClick(event, l.key)}
+                        className={`block rounded-lg px-4 py-3 text-sm transition ${
+                          activeSection === l.key
+                            ? "bg-white/10 font-medium text-white"
+                            : "text-muted hover:bg-white/5 hover:text-white"
+                        }`}
+                      >
+                        {l.label}
+                      </a>
+                    </li>
+                  ))}
+                </motion.ul>
+              </>
             )}
           </AnimatePresence>
         </div>

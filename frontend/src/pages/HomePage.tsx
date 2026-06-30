@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import Aurora from "@/components/ui/Aurora";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -23,6 +25,7 @@ import {
   visibleMainSections,
 } from "@/lib/sections";
 import type { PortfolioData, SectionKey } from "@/lib/types";
+import { scrollToSection } from "@/lib/scroll";
 
 function sectionHasContent(data: PortfolioData, key: SectionKey): boolean {
   switch (key) {
@@ -45,6 +48,18 @@ function sectionHasContent(data: PortfolioData, key: SectionKey): boolean {
 
 export default function HomePage() {
   const { data, loading } = usePortfolio();
+  const { pathname, hash } = useLocation();
+
+  useEffect(() => {
+    if (!data || pathname !== "/") return;
+
+    const sectionId = hash.replace(/^#/, "");
+    if (!sectionId) return;
+
+    requestAnimationFrame(() => {
+      scrollToSection(sectionId, false);
+    });
+  }, [data, pathname, hash]);
 
   if (loading) {
     return (
