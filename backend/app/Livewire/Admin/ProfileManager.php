@@ -41,6 +41,12 @@ class ProfileManager extends Component
     #[Validate('nullable|string|max:255')]
     public ?string $resume_url = '';
 
+    #[Validate('nullable|string|max:80')]
+    public ?string $cv_download_label = '';
+
+    #[Validate('nullable|string|max:80')]
+    public ?string $cv_view_label = '';
+
     #[Validate('integer|min:0|max:80')]
     public int $years_experience = 0;
 
@@ -57,7 +63,8 @@ class ProfileManager extends Component
         $this->profile = Profile::current();
         $this->fill($this->profile->only([
             'name', 'title', 'headline', 'bio', 'about', 'email', 'phone',
-            'location', 'resume_url', 'years_experience', 'projects_completed',
+            'location', 'resume_url', 'cv_download_label', 'cv_view_label',
+            'years_experience', 'projects_completed',
             'happy_clients', 'available_for_work',
         ]));
     }

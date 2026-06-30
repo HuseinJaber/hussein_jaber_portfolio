@@ -126,7 +126,7 @@ export default function HomePage() {
       />
       <HomeSectionAnalytics sections={sections} />
       <main>
-        <Hero profile={profile} socials={socials} projectCount={projects.length} />
+        <Hero profile={profile} projectCount={projects.length} />
         {mainSectionKeys.map((key) => (
           <div key={key}>{sectionBlocks[key]}</div>
         ))}

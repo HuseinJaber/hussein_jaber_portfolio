@@ -113,15 +113,17 @@ export default function ProjectPage() {
           )}
         </div>
 
-        <div className="mt-10 flex h-64 items-center justify-center overflow-hidden rounded-2xl border border-line bg-gradient-to-br from-surface-2 to-surface">
+        <div className="relative mx-auto mt-6 aspect-video w-full max-w-xl overflow-hidden rounded-2xl border border-line bg-gradient-to-br from-surface-2 to-surface">
           {project.cover_image ? (
             <img
               src={project.cover_image}
               alt={project.title}
-              className="h-full w-full object-cover"
+              className="absolute inset-0 h-full w-full object-contain p-4"
             />
           ) : (
-            <span className="text-7xl font-bold text-white/10">{project.title.charAt(0)}</span>
+            <span className="flex h-full items-center justify-center text-7xl font-bold text-white/10">
+              {project.title.charAt(0)}
+            </span>
           )}
         </div>
 

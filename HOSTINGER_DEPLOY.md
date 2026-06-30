@@ -74,25 +74,48 @@ git push origin main
 3. Note the folder Hostinger creates (often `domains/api.huseinjaber.com/public_html` or
    similar under your account home).
 
-### Step 3 — Enable SSL
+### Step 3 — Configure DNS
+
+In **Domains → huseinjaber.com → DNS**, confirm these records (replace IP if your
+plan details show a different hosting IP):
+
+| Type | Name | Value |
+| --- | --- | --- |
+| A | `@` | `91.108.101.202` |
+| A | `api` | `91.108.101.202` |
+| CNAME | `www` | `huseinjaber.com` |
+
+Nameservers `cosmos.dns-parking.com` / `nova.dns-parking.com` are valid Hostinger
+NS — you do **not** need to change them if the A records above are correct.
+
+Verify propagation:
+
+```bash
+dig +short huseinjaber.com A      # expect your hosting IP, not 208.91.112.55
+dig +short api.huseinjaber.com A
+```
+
+Wrong IP `208.91.112.55` means DNS is still on a parking/block page. Wait up to
+24 hours after saving records (TTL is often 30 min).
+
+### Step 4 — Enable SSL
 
 1. **Websites** → **huseinjaber.com** → **SSL** → enable free SSL.
 2. Repeat for **api.huseinjaber.com**.
 
-DNS for domains on the same Hostinger account is usually automatic. If the site
-does not resolve within an hour, check **Domains → huseinjaber.com → DNS** — the
-main domain and `api` should point to Hostinger (not a parking page).
+SSL only issues once DNS points to your hosting IP. If the site does not resolve
+within an hour, re-check the A records in Step 3.
 
 ---
 
 ## Phase 3 — Deploy backend (api.huseinjaber.com)
 
-### Step 4 — SSH or File Manager
+### Step 5 — SSH or File Manager
 
 Use **SSH** (hPanel → **Advanced → SSH Access**) if available; otherwise use
 **File Manager**.
 
-### Step 5 — Clone the repo
+### Step 6 — Clone the repo
 
 SSH example (paths vary by account — check hPanel **File Manager** for yours):
 
@@ -105,14 +128,14 @@ cd hussein_jaber_portfolio/backend
 If Git SSH is not set up on Hostinger, use HTTPS or upload a zip of the repo via
 File Manager.
 
-### Step 6 — Create MySQL database
+### Step 7 — Create MySQL database
 
 1. hPanel → **Databases → MySQL Databases**.
 2. Create database (e.g. `u123456789_portfolio`).
 3. Create user + strong password; grant **all privileges** on that database.
 4. Note: **host** is often `localhost` on shared hosting (not `127.0.0.1`).
 
-### Step 7 — Configure `.env`
+### Step 8 — Configure `.env`
 
 ```bash
 cd ~/hussein_jaber_portfolio/backend
@@ -154,7 +177,7 @@ Generate app key (first deploy only):
 php artisan key:generate
 ```
 
-### Step 8 — Install dependencies and build admin assets
+### Step 9 — Install dependencies and build admin assets
 
 ```bash
 composer install --no-dev --optimize-autoloader
@@ -184,7 +207,7 @@ ln -sfn ../storage/app/public public/storage
 
 Set **PHP 8.3+** in hPanel → **Advanced → PHP Configuration**.
 
-### Step 9 — Import database
+### Step 10 — Import database
 
 **Option A — phpMyAdmin (recommended for first deploy):**
 
@@ -200,7 +223,7 @@ mysql -u DB_USER -p DB_NAME < ~/portfolio_export.sql
 
 After import, confirm tables exist (`profiles`, `projects`, `users`, …).
 
-### Step 10 — Laravel setup commands
+### Step 11 — Laravel setup commands
 
 ```bash
 cd ~/hussein_jaber_portfolio/backend
@@ -218,7 +241,7 @@ empty database:
 php artisan migrate --force   # only if you did NOT import a dump
 ```
 
-### Step 11 — Sync into `public_html/{frontend,backend}`
+### Step 12 — Sync into `public_html/{frontend,backend}`
 
 After Laravel is configured in the git clone, run the **one-time layout migration**:
 
@@ -236,7 +259,7 @@ This creates:
 └── backend/     ← Laravel (includes .env from clone)
 ```
 
-### Step 12 — Point document roots (hPanel)
+### Step 13 — Point document roots (hPanel)
 
 | Site | Document root |
 |------|----------------|
@@ -245,14 +268,14 @@ This creates:
 
 Replace `u841931881` with your Hostinger username if different.
 
-### Step 13 — Writable directories
+### Step 14 — Writable directories
 
 Ensure these are writable (775):
 
 - `public_html/backend/storage/` (recursive)
 - `public_html/backend/bootstrap/cache/`
 
-### Step 14 — Verify backend
+### Step 15 — Verify backend
 
 - `https://api.huseinjaber.com/api/portfolio` → JSON payload
 - `https://api.huseinjaber.com/admin` → login page
@@ -262,7 +285,7 @@ Ensure these are writable (775):
 
 ## Phase 4 — Deploy frontend (huseinjaber.com)
 
-### Step 15 — Production build (on your Mac)
+### Step 16 — Production build (on your Mac)
 
 ```bash
 cd frontend
@@ -272,7 +295,7 @@ npm run build
 git add -f dist/ && git commit -m "Update production frontend build" && git push
 ```
 
-### Step 16 — Sync on server
+### Step 17 — Sync on server
 
 ```bash
 cd ~/hussein_jaber_portfolio && git pull
@@ -288,7 +311,7 @@ rsync -a --delete ~/hussein_jaber_portfolio/frontend/dist/ \
 
 Use `rsync` or `cp -r dist/.` — **not** `cp dist/*` (skips `.htaccess`).
 
-### Step 17 — Verify frontend
+### Step 18 — Verify frontend
 
 - `https://huseinjaber.com` — homepage loads with your content
 - `https://huseinjaber.com/projects/<slug>` — project detail (no 404)
@@ -355,12 +378,17 @@ php artisan migrate --force
 
 | Problem | Fix |
 | --- | --- |
+| Privacy error on company Wi‑Fi only (`NET::ERR_CERT_AUTHORITY_INVALID`) | FortiGuard DNS block — cert shows `Fortiguard SDNS Blocked Page`. Site works on hotspot. Ask IT to whitelist the domain. |
+| Privacy error everywhere | DNS still on parking IP (`208.91.112.55`). Set A records to hosting IP, wait for propagation, enable SSL. |
+| `dig` shows wrong IP | DNS propagation (up to 24h) or stale cache. Re-save A records; verify with `dig +short huseinjaber.com A`. |
 | API returns 500 | Check `backend/storage/logs/laravel.log`; fix permissions on `storage/` |
 | CORS error in browser | `FRONTEND_URL` must exactly match `https://huseinjaber.com` (no trailing slash) |
 | Admin unstyled | Run `npm run build` in `backend/`; ensure `public/build/` exists |
 | SPA routes 404 | `.htaccess` missing in `public_html/frontend/` |
 | Empty portfolio | Database not imported or wrong `DB_*` in `.env` |
 | CV PDF 404 | File at `backend/public/files/hussein-jaber-cv.pdf`; run `storage:link` |
+
+See also **[DEPLOYMENT_SUMMARY.md](./DEPLOYMENT_SUMMARY.md)** for a consolidated ops reference.
 
 ---
 

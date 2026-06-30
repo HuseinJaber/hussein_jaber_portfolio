@@ -20,12 +20,12 @@ function ProjectCard({ project }: { project: Project }) {
       to={`/projects/${project.slug}`}
       className="group block h-full overflow-hidden rounded-2xl border border-line bg-white/[0.02] transition hover:-translate-y-1 hover:border-brand"
     >
-      <div className="relative h-40 overflow-hidden bg-gradient-to-br from-surface-2 to-surface sm:h-44">
+      <div className="relative aspect-video w-full overflow-hidden bg-gradient-to-br from-surface-2 to-surface">
         {project.cover_image ? (
           <img
             src={project.cover_image}
             alt={project.title}
-            className="h-full w-full object-contain transition duration-500 group-hover:scale-105"
+            className="absolute inset-0 h-full w-full object-contain p-4"
           />
         ) : (
           <div className="flex h-full items-center justify-center text-5xl font-bold text-white/10">

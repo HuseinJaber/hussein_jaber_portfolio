@@ -47,6 +47,8 @@ cd frontend && npm run dev   # http://localhost:5173
 - Pages fetch the Laravel API from the browser, so the backend **must be running**
   or the site shows a "Backend not reachable" fallback.
   API base URL is `frontend/.env.local` (`VITE_API_URL`).
+- If `localhost:5173` refuses connection, restart `npm run dev`. Remove stale
+  Next.js cache with `rm -rf frontend/.next` if Turbopack errors appear.
 
 **Frontend styling gotcha:** Tailwind v4 auto-generates utilities from the
 `@theme` block in `src/globals.css` (e.g. `--color-muted` → `text-muted`,
@@ -90,7 +92,12 @@ existing duplicates — run `php artisan migrate` on stale databases.
 **Next.js backup:** Original Next.js frontend archived at `frontend-nextjs-backup.zip`.
 
 **Hostinger deploy:** See **[HOSTINGER_DEPLOY.md](./HOSTINGER_DEPLOY.md)** — build frontend,
-upload `dist/` to `public_html`, Laravel on `api.huseinjaber.com`.
+upload `dist/` to `public_html`, Laravel on `api.huseinjaber.com`. Ops summary:
+**[DEPLOYMENT_SUMMARY.md](./DEPLOYMENT_SUMMARY.md)**.
+
+**Production DNS gotcha:** Company networks using FortiGuard may block `huseinjaber.com`
+and serve a self-signed cert (`ERR_CERT_AUTHORITY_INVALID`). Not a deploy issue — test
+on hotspot or ask IT to whitelist the domain.
 
 **Content:** Profile, experience, certifications and core copy are seeded from the
 owner's CV in `DatabaseSeeder.php`. ~90 projects are imported from local dev

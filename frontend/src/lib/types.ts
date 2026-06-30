@@ -33,6 +33,8 @@ export interface Profile {
   location: string | null;
   avatar: string | null;
   resume_url: string | null;
+  cv_download_label: string | null;
+  cv_view_label: string | null;
   sections: SectionSettings;
   section_order?: SectionKey[];
   section_copy?: Partial<SectionCopyMap>;

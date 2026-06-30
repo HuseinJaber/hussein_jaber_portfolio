@@ -57,16 +57,25 @@ cd frontend && npm run lint && npm run build
 
 Do **not** commit `.env` files. Copy from `.env.example` on each environment.
 
-## Production deploy (Hostinger)
+## Production (live)
 
-Full step-by-step: **[HOSTINGER_DEPLOY.md](./HOSTINGER_DEPLOY.md)** — GitHub push, database
+- **Site:** https://huseinjaber.com
+- **API / admin:** https://api.huseinjaber.com
+
+Ops reference: **[DEPLOYMENT_SUMMARY.md](./DEPLOYMENT_SUMMARY.md)** — DNS, SSL, routine
+updates, troubleshooting.  
+First-time deploy: **[HOSTINGER_DEPLOY.md](./HOSTINGER_DEPLOY.md)** — GitHub push, database
 export, `api.huseinjaber.com` (Laravel), `huseinjaber.com` (upload `frontend/dist/`).
+
+> **Note:** Some corporate networks (FortiGuard) block the domain and show a fake SSL
+> cert. Test on mobile hotspot or home Wi‑Fi if you see a privacy error at work.
 
 ## Docs
 
 | File | Purpose |
 | --- | --- |
 | [PROJECT.md](./PROJECT.md) | Architecture, API, admin guide, deployment |
+| [DEPLOYMENT_SUMMARY.md](./DEPLOYMENT_SUMMARY.md) | Live ops, DNS, SSL, troubleshooting |
 | [AGENTS.md](./AGENTS.md) | Cursor agent / VM operating notes |
 | [backend/README.md](./backend/README.md) | Laravel app quick reference |
 | [HOSTINGER_DEPLOY.md](./HOSTINGER_DEPLOY.md) | Production go-live on Hostinger |

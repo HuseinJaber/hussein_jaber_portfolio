@@ -2,32 +2,49 @@
 
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
-import type { Profile, SocialLink } from "@/lib/types";
+import type { Profile } from "@/lib/types";
 import { AnimatedCounter } from "@/components/ui/AnimatedCounter";
-import { SocialIcon, EmailIcon, LocationIcon, ContactIconBox } from "@/components/ui/icons";
+import { EmailIcon, LocationIcon, ContactIconBox } from "@/components/ui/icons";
 import CvActions from "@/components/cv/CvActions";
 
 export default function Hero({
   profile,
-  socials,
   projectCount,
 }: {
   profile: Profile;
-  socials: SocialLink[];
   projectCount: number;
 }) {
   const root = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const el = root.current;
+    if (!el) return;
+
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
-      tl.from(".hero-badge", { y: 20, opacity: 0, duration: 0.6 })
-        .from(".hero-line", { y: 40, opacity: 0, duration: 0.8, stagger: 0.12 }, "-=0.2")
-        .from(".hero-sub", { y: 20, opacity: 0, duration: 0.6 }, "-=0.4")
-        .from(".hero-cta", { y: 20, opacity: 0, duration: 0.6, stagger: 0.1 }, "-=0.3")
-        .from(".hero-social", { scale: 0, opacity: 0, duration: 0.4, stagger: 0.06 }, "-=0.4");
-    }, root);
-    return () => ctx.revert();
+      const fadeUp = {
+        y: 20,
+        opacity: 0,
+        duration: 0.6,
+        clearProps: "opacity,transform",
+      };
+
+      gsap
+        .timeline({ defaults: { ease: "power3.out" } })
+        .from(".hero-badge", fadeUp)
+        .from(".hero-line", { ...fadeUp, y: 40, duration: 0.8, stagger: 0.12 }, "-=0.2")
+        .from(".hero-sub", fadeUp, "-=0.4")
+        .from(".hero-cta", { y: 16, duration: 0.55, stagger: 0.08, clearProps: "transform" }, "-=0.3");
+    }, el);
+
+    return () => {
+      ctx.revert();
+      gsap.set(el.querySelectorAll(".hero-cta"), {
+        clearProps: "all",
+        opacity: 1,
+        scale: 1,
+        y: 0,
+      });
+    };
   }, []);
 
   const stats = [
@@ -58,27 +75,12 @@ export default function Hero({
             {profile.headline ?? profile.bio}
           </p>
 
-          <div className="mt-6 flex flex-wrap items-center gap-4">
-            <CvActions resumeUrl={profile.resume_url} />
-          </div>
-
-          <div className="mt-10 flex gap-3">
-            {socials.map((s) => (
-              <a
-                key={s.id}
-                href={s.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={s.label ?? s.platform}
-                className={`hero-social flex h-11 w-11 items-center justify-center rounded-xl border border-line bg-white/5 text-muted transition hover:-translate-y-0.5 hover:text-white ${
-                  (s.icon ?? s.platform).toLowerCase() === "whatsapp"
-                    ? "hover:border-emerald-400/50 hover:bg-emerald-400/10 hover:text-emerald-300"
-                    : "hover:border-brand"
-                }`}
-              >
-                <SocialIcon name={s.icon ?? s.platform} className="h-5 w-5" />
-              </a>
-            ))}
+          <div className="mt-8 flex flex-wrap items-center gap-4">
+            <CvActions
+              resumeUrl={profile.resume_url}
+              downloadLabel={profile.cv_download_label}
+              viewLabel={profile.cv_view_label}
+            />
           </div>
         </div>
 

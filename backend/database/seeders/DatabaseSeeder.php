@@ -43,6 +43,8 @@ class DatabaseSeeder extends Seeder
             'phone' => '+961 70 004 893',
             'location' => 'Beirut, Lebanon',
             'resume_url' => '/files/hussein-jaber-cv.pdf',
+            'cv_download_label' => 'Download CV',
+            'cv_view_label' => 'View custom CV',
             'years_experience' => 3,
             'projects_completed' => 90,
             'happy_clients' => 40,
