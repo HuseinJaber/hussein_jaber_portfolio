@@ -43,5 +43,8 @@ frontend-nextjs-backup.zip
 portfolio_export.sql
 *.sql.gz
 
+# Local deploy packages (upload to Hostinger manually)
+backend-build-upload.zip
+
 # Laravel storage (keep structure via nested .gitignore files)
 backend/storage/*.key
